@@ -1,18 +1,45 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import React, { useEffect } from 'react';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Platform } from 'react-native';
+import { Colors } from '@/constants/theme';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      // Inject Google Fonts link dynamically for web rendering
+      const linkId = 'botanical-fonts';
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href =
+          'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap';
+        document.head.appendChild(link);
+      }
 
-SplashScreen.preventAutoHideAsync();
+      // Base body styling
+      if (document.body) {
+        document.body.style.backgroundColor = Colors.surface;
+        document.body.style.margin = '0';
+        document.body.style.fontFamily = '"Plus Jakarta Sans", sans-serif';
+      }
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+      // Page Title
+      document.title = 'Botanical Living | Rare Plants & Handcrafted Vessels';
+    }
+  }, []);
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: Colors.surface },
+        }}
+      />
+    </SafeAreaProvider>
   );
 }

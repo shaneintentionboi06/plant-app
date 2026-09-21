@@ -1,0 +1,527 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-container": "#1b4332", "surface-container-high": "#eae8e4", "on-surface": "#1b1c1a", "surface-container-highest": "#e4e2de", "on-background": "#1b1c1a", "on-primary-fixed-variant": "#274e3d", "on-primary-fixed": "#002114", "on-tertiary": "#ffffff", "inverse-on-surface": "#f2f0ed", "secondary-fixed-dim": "#85d7ad", "on-primary": "#ffffff", "on-secondary-fixed": "#002113", "surface-variant": "#e4e2de", "surface-dim": "#dbdad6", "outline": "#717973", "surface-container-lowest": "#ffffff", "secondary-container": "#a0f4c8", "on-tertiary-fixed": "#141f05", "surface-bright": "#fbf9f5", "primary-fixed-dim": "#a5d0b9", "on-tertiary-container": "#9eac85", "primary-fixed": "#c1ecd4", "tertiary": "#1f2a0e", "surface": "#fbf9f5", "on-secondary": "#ffffff", "inverse-primary": "#a5d0b9", "error-container": "#ffdad6", "error": "#ba1a1a", "on-surface-variant": "#414844", "on-secondary-container": "#19724f", "background": "#fbf9f5", "inverse-surface": "#30312e", "surface-container-low": "#f5f3ef", "outline-variant": "#c1c8c2", "tertiary-container": "#344022", "surface-container": "#efeeea", "on-error-container": "#93000a", "on-tertiary-fixed-variant": "#3f4b2c", "secondary": "#0e6c4a", "surface-tint": "#3f6653", "secondary-fixed": "#a0f4c8", "primary": "#012d1d", "tertiary-fixed": "#dae8be", "on-primary-container": "#86af99", "tertiary-fixed-dim": "#becca3", "on-secondary-fixed-variant": "#005236", "on-error": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "space-xs": "0.25rem", "margin": "1.5rem", "space-md": "1rem", "gutter": "1rem", "space-2xl": "3rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "gutter-mobile": "0.75rem", "margin-mobile": "1rem" }, "fontFamily": { "headline-sm": ["Playfair Display"], "headline-lg": ["Playfair Display"], "label-sm": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Playfair Display"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Playfair Display"], "display-lg": ["Playfair Display"] }, "fontSize": { "headline-sm": ["18px", { "lineHeight": "26px", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "30px", "fontWeight": "500" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }] } } } };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#fbf9f5;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(27,67,50,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="PLANTS Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrbuTxNPctUf_L8WrbPqwJrHUZcxU4MIJCEWQ-k_tceVi7Fj9krIIoKV20qhlr1Afw0U7KkaMtPBPhx0dOhjxf4wDZr73Phgd2O-Xyp6aQQshiSdGGSZ2kP-KT15IsXBvoG6MCgRt4oT0QaK2zTO68BcKejxPzf_dB_wRFPKcIKT4FDvh2BvQKuYV7a7qy4L8aCfuuLJwymHAQsUmmytzEP0pc0V4VkJgpkqTwhXOAxrK7a0QjR4XVdg"><span class="font-headline-sm text-headline-sm text-primary truncate tracking-tight font-serif">PLANTS</span><span class="hidden">Shop</span></div><div class="flex items-center gap-space-xs"><button aria-label="Search plants" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors active:scale-95"><span class="material-symbols-outlined">search</span></button><button aria-label="Open Location &amp; Growing Zone Picker" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors active:scale-95 relative"><span class="material-symbols-outlined text-[22px]">location_on</span></button><a class="w-11 h-11 flex items-center justify-center rounded-full active:scale-95 transition-transform ml-space-xs" data-path="account" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCg9mmuvv0Byz4xs78grd1XS3HITc-i_J7jGr9yPQZI0vfAkQqbK6yPoJfsD9Ap8OQStDGoIxqicaHdgKGTWtE0UZWS4d9yaU7N7hcl4LeUVlrB0yGEDEhTPyIc1Q63ZDaqIc0XdjMs5p0BNnR4wk-gKq4yxGpd7-Pj3b5gjLzllxrul6mdfWbBitgb6elb4a9vSmgMahUh19fmBHh192anKq8suM2TPoDxoldtvO1Ga4l2I9zucG4-uA"></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-20 bg-surface"><div class="flex flex-col w-full">
+<!-- Search & Filter Bar Section -->
+<section class="px-margin-mobile pt-space-sm pb-space-xs">
+<div class="flex items-center gap-gutter-mobile">
+<div class="relative flex-1 flex items-center bg-surface-container-lowest rounded-full shadow-[0_4px_20px_rgba(27,67,50,0.06)] px-space-md py-space-sm">
+<span class="material-symbols-outlined text-secondary mr-space-xs select-none">search</span>
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none" placeholder="Search monsteras, ferns, succulents..." type="text">
+<button aria-label="Clear or voice search" class="text-outline hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+</div>
+<!-- Filter Drawer Trigger Button with Badge -->
+<button aria-label="Open Filter and Sort Menu" class="relative flex items-center justify-center bg-primary text-on-primary h-12 w-12 rounded-full shadow-[0_4px_16px_rgba(1,45,29,0.2)] active:scale-95 transition-transform shrink-0" id="filter-drawer-open">
+<span class="material-symbols-outlined text-[22px]">tune</span>
+<span class="absolute -top-1 -right-1 bg-secondary-container text-on-secondary-container font-label-sm text-[10px] h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center font-bold shadow-sm">3</span>
+</button>
+</div>
+</section>
+<!-- Horizontal Scrollable Requirement Chips -->
+<section class="px-margin-mobile pt-space-xs pb-0"><div class="flex items-center justify-between bg-surface-container-low/90 rounded-full px-space-md py-1.5 shadow-xs border-0"><div class="flex items-center gap-1.5 min-w-0"><span class="material-symbols-outlined text-secondary text-[16px] shrink-0">location_on</span><span class="font-label-sm text-[11px] text-on-surface truncate"><span class="text-on-surface-variant">Thriving in: </span><span class="font-bold text-primary">San Francisco, CA</span> <span class="text-secondary font-semibold">(Zone 10a)</span></span></div><button class="font-label-sm text-[11px] text-secondary hover:text-primary font-bold shrink-0 flex items-center gap-0.5 ml-space-xs transition-colors"><span class="">Change</span><span class="material-symbols-outlined text-[14px]">expand_more</span></button></div></section><section class="py-space-sm">
+<div class="flex items-center gap-space-xs overflow-x-auto px-margin-mobile no-scrollbar select-none" id="filter-chips-container">
+<!-- Active Chip -->
+<button class="filter-chip active flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap shadow-sm transition-all active:scale-95">
+<span class="material-symbols-outlined text-[16px]">eco</span>
+<span class="">All Plants</span>
+</button>
+<button class="filter-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-low text-primary font-label-md text-label-md whitespace-nowrap transition-all hover:bg-surface-container active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-secondary">wb_twilight</span>
+<span class="">Low Light</span>
+</button>
+<button class="filter-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-low text-primary font-label-md text-label-md whitespace-nowrap transition-all hover:bg-surface-container active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-secondary">pets</span>
+<span class="">Pet Friendly</span>
+</button>
+<button class="filter-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-low text-primary font-label-md text-label-md whitespace-nowrap transition-all hover:bg-surface-container active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-secondary">air</span>
+<span class="">Air Purifying</span>
+</button>
+<button class="filter-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-low text-primary font-label-md text-label-md whitespace-nowrap transition-all hover:bg-surface-container active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-secondary">spa</span>
+<span class="">Easy Care</span>
+</button>
+<button class="filter-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-low text-primary font-label-md text-label-md whitespace-nowrap transition-all hover:bg-surface-container active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-secondary">payments</span>
+<span class="">Under $35</span>
+</button>
+<button class="filter-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-low text-primary font-label-md text-label-md whitespace-nowrap transition-all hover:bg-surface-container active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-secondary">park</span>
+<span class="">Large Trees</span>
+</button>
+</div>
+</section><section class="pt-space-md pb-space-xs"><div class="px-margin-mobile flex items-center justify-between mb-space-xs"><div class="flex flex-col"><div class="flex items-center gap-1.5"><h3 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Thriving in Your Area</h3><span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Zone 10a</span></div><p class="font-body-sm text-[12px] text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-secondary text-[14px]">nest_eco_leaf</span>Optimized for NorCal coastal humidity &amp; moderate sun</p></div><button class="font-label-md text-label-md text-secondary hover:text-primary font-semibold shrink-0">See All</button></div><div class="flex gap-gutter-mobile overflow-x-auto px-margin-mobile no-scrollbar select-none pt-space-xs pb-space-sm"><article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden w-40 shrink-0"><div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden"><img class="w-full h-full object-cover object-center" data-alt="Staghorn Fern mounted on dark reclaimed wood in soft coastal morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVlC-rBsoPnzqxAfKEEJnSjXMrSnS0lWnizQs-k95mYzjIiPRjSIbeRnm7493pznvpum46jVJqC4JZJ6StorFbBAlsQxsFb6QM9ICuVR2LIYyRQ9FiwRz16OpI7Gecs3AtAchIT1SSeyJHu5v2VrqH05b3GWjtenzt1Ay3KKOVw7CLX104ihwxuVP1gFs-RIXMsnhGws19CVzbkowuYuD8tPLmsT7UHt4IjoAP0NNgSSzUN-n_1l_xMw"><div class="absolute top-2 left-2 z-10"><span class="bg-secondary text-on-secondary font-label-sm text-[9px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">98% Match</span></div><div class="absolute bottom-2 left-2 right-2 flex items-center pointer-events-none"><span class="bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface font-label-sm text-[9px] font-medium truncate">Fog &amp; Humidity Lover</span></div></div><div class="p-space-sm flex flex-col flex-1 justify-between"><div><h4 class="font-headline-sm text-[13px] leading-tight text-primary font-serif font-medium truncate">Staghorn Fern</h4><p class="font-body-sm text-[10px] text-on-surface-variant truncate">Platycerium bifurcatum</p></div><div class="flex items-center justify-between pt-1.5"><span class="font-headline-sm text-[14px] text-primary font-bold">$34</span><button aria-label="Add Staghorn Fern to cart" class="add-to-cart-btn w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-xs"><span class="material-symbols-outlined text-[16px]">add</span></button></div></div></article><article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden w-40 shrink-0"><div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden"><img class="w-full h-full object-cover object-center" data-alt="Maidenhair Fern with delicate emerald leaflets in terracotta pot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA7abj6ZRXEeyQXjyMvKR3g3AdG36ePaMsKn-Okn74BSDL01Fly99RflehGBoKLqaIWoQs48l5dW9JXpVwP7HM16X__D67bGAagSyeM0s8yMmUgVrnPpC_PVJQyoOUC7wxEUzKhDx8gId1X9CN5IhZcCX4s8Wah1Xc6kBs05JD7wRzOs16AEQq2I6iEkQygZ44OTcR6dOAZAAkcSscyyfdCr5EMPyvb7Rj1mXVZFr-SlLFGAs89i7-4w"><div class="absolute top-2 left-2 z-10"><span class="bg-secondary text-on-secondary font-label-sm text-[9px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">96% Match</span></div><div class="absolute bottom-2 left-2 right-2 flex items-center pointer-events-none"><span class="bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface font-label-sm text-[9px] font-medium truncate">Cool Breeze Tolerant</span></div></div><div class="p-space-sm flex flex-col flex-1 justify-between"><div><h4 class="font-headline-sm text-[13px] leading-tight text-primary font-serif font-medium truncate">Maidenhair Fern</h4><p class="font-body-sm text-[10px] text-on-surface-variant truncate">Adiantum raddianum</p></div><div class="flex items-center justify-between pt-1.5"><span class="font-headline-sm text-[14px] text-primary font-bold">$26</span><button aria-label="Add Maidenhair Fern to cart" class="add-to-cart-btn w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-xs"><span class="material-symbols-outlined text-[16px]">add</span></button></div></div></article><article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden w-40 shrink-0"><div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden"><img class="w-full h-full object-cover object-center" data-alt="Monstera Adansonii monkey mask hanging vine in ceramic pot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6DStvkNBTRWzcPmW04dM4QrmeQbMo2FlRRw_wYSUBTXQHKnO3T_UuBJWq4RHBZDeXAG0tckGgHm1tLc3E2T1mFc8qtQYxivjO10s5qKJpK3T6AhoX7UHAU7fanYcTEoW0Cuqrs4lHaNEEMZvUnGNG3diriI1bWGXjuz3qprt0o-7Xa_sLbPZSaW9T0wMCsOfA7GB8Vn12n64EGbzC0M2c0ToPolOo0C2ZTWf-2p0PHYbuumMc87Subw"><div class="absolute top-2 left-2 z-10"><span class="bg-secondary text-on-secondary font-label-sm text-[9px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">94% Match</span></div><div class="absolute bottom-2 left-2 right-2 flex items-center pointer-events-none"><span class="bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface font-label-sm text-[9px] font-medium truncate">Indirect Sun Lover</span></div></div><div class="p-space-sm flex flex-col flex-1 justify-between"><div><h4 class="font-headline-sm text-[13px] leading-tight text-primary font-serif font-medium truncate">Monstera Adansonii</h4><p class="font-body-sm text-[10px] text-on-surface-variant truncate">Swiss Cheese Vine</p></div><div class="flex items-center justify-between pt-1.5"><span class="font-headline-sm text-[14px] text-primary font-bold">$30</span><button aria-label="Add Monstera Adansonii to cart" class="add-to-cart-btn w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-xs"><span class="material-symbols-outlined text-[16px]">add</span></button></div></div></article></div></section>
+<!-- Curated Promotional Editorial Card -->
+<section class="px-margin-mobile py-space-xs">
+<div class="relative overflow-hidden rounded-xl bg-primary-container text-on-primary shadow-[0_8px_24px_rgba(27,67,50,0.12)]">
+<!-- Background Botanical Ambient Image with Scrim -->
+<div class="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-35 scale-105" data-alt="Close up photography of lush vibrant variegated monstera and philodendron leaves with delicate water mist droplets in soft warm morning greenhouse sunlight, earth tones, forest green, natural textures" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCXmSkk3cOR2yR5OFJpxGu9slmY2QQUpBj6ZnbICO6FFfAxwk67lsTq1-b_zrbKXcyhzh7dD1K3Ar7XV3eS3lca8NW1TdeWUtGdbGGBPkvdx0whJ42_A1bmbIG1mfeZbT5sFnNe6bgZLjw7dDCU1mHzKeVls2TBNbC-SEWA7g63N67boUqFPJIDuVk20ppmQYFj5UB768nzXi1xWRZYG9aNI1qlAfuJsANgYz9P6uoSRctjXbkPutfTQA')"></div>
+<div class="relative z-10 p-space-lg flex flex-col items-start max-w-[75%]">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase tracking-wider mb-space-xs">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+          Seasonal Offer
+        </span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile font-headline-sm text-surface-bright leading-tight tracking-tight mb-space-xs">
+          Spring Plant Drop
+        </h2>
+<p class="font-body-sm text-body-sm text-surface-container-highest mb-space-md opacity-95">
+          20% off rare botanical aroids &amp; handcrafted terracotta vessels this weekend only.
+        </p>
+<button class="flex items-center gap-1.5 bg-surface-container-lowest text-primary px-space-md py-2 rounded-lg font-label-md text-label-md shadow-sm active:scale-95 transition-transform">
+<span class="">Explore Drop</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<!-- Organic Decorative Emblem Graphic -->
+<div class="absolute -right-6 -bottom-6 w-36 h-36 rounded-full bg-secondary/20 pointer-events-none blur-xl"></div>
+<div class="absolute right-3 bottom-3 opacity-20 pointer-events-none text-surface-bright">
+<span class="material-symbols-outlined text-[96px]">nest_eco_leaf</span>
+</div>
+</div>
+</section>
+<!-- Section Header & Active Result Counters -->
+<section class="px-margin-mobile pt-space-lg pb-space-xs flex items-center justify-between">
+<div class="flex items-baseline gap-2">
+<h3 class="font-headline-sm text-headline-sm text-primary font-medium">Indoor Foliage</h3>
+<span class="font-label-md text-label-md text-on-surface-variant">(42 items)</span>
+</div>
+<!-- Quick Sorting Selector -->
+<div class="flex items-center gap-1 text-on-surface-variant text-label-md font-label-md">
+<span class="material-symbols-outlined text-[16px]">swap_vert</span>
+<span class="text-primary font-semibold">Popularity</span>
+</div>
+</section>
+<!-- 2-Column Product Catalog Grid -->
+<section class="px-margin-mobile py-space-xs">
+<div class="grid grid-cols-2 gap-gutter-mobile">
+<!-- Product Card 1: Monstera Deliciosa -->
+<article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden transition-all hover:shadow-[0_8px_24px_-4px_rgba(27,67,50,0.12)]">
+<!-- Image Container with Badges & Wishlist -->
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105" data-alt="Potted Monstera Deliciosa Swiss Cheese plant in a minimalist off-white ceramic pot sitting on a warm natural linen cloth surface, soft sunlit conservatory lighting, editorial plant styling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVlC-rBsoPnzqxAfKEEJnSjXMrSnS0lWnizQs-k95mYzjIiPRjSIbeRnm7493pznvpum46jVJqC4JZJ6StorFbBAlsQxsFb6QM9ICuVR2LIYyRQ9FiwRz16OpI7Gecs3AtAchIT1SSeyJHu5v2VrqH05b3GWjtenzt1Ay3KKOVw7CLX104ihwxuVP1gFs-RIXMsnhGws19CVzbkowuYuD8tPLmsT7UHt4IjoAP0NNgSSzUN-n_1l_xMw">
+<!-- Badges Floating -->
+<div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+<span class="bg-primary text-on-primary font-label-sm text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
+              Best Seller
+            </span>
+</div>
+<!-- Favorite Wishlist Toggle -->
+<button aria-label="Add to wishlist" class="wishlist-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-on-surface-variant flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+<!-- Care Glyph Tags Over Image Bottom -->
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+<div class="flex items-center gap-1 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[13px]">wb_sunny</span>
+<span class="font-label-sm text-[10px] font-medium">Indirect</span>
+</div>
+<div class="flex items-center gap-0.5 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[12px]">water_drop</span>
+<span class="material-symbols-outlined text-outline-variant text-[12px]">water_drop</span>
+</div>
+</div>
+</div>
+<!-- Product Content -->
+<div class="p-space-sm flex flex-col flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between gap-1 mb-0.5">
+<span class="font-label-sm text-[10px] text-outline font-semibold uppercase tracking-wider">Monstera</span>
+<div class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-[11px] font-bold text-on-surface">4.9</span>
+</div>
+</div>
+<h4 class="font-headline-sm text-[15px] leading-snug text-primary font-serif font-medium line-clamp-1">Monstera Deliciosa</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-1 mb-space-xs">Swiss Cheese Plant</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-outline">From</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold leading-none">$42</span>
+</div>
+<!-- Quick Add Button -->
+<button aria-label="Add Monstera to cart" class="add-to-cart-btn w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-[0_2px_8px_rgba(1,45,29,0.3)] hover:bg-primary-container">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 2: Calathea Orbifolia -->
+<article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden transition-all hover:shadow-[0_8px_24px_-4px_rgba(27,67,50,0.12)]">
+<!-- Image Container with Badges & Wishlist -->
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105" data-alt="Calathea Orbifolia plant with wide striped round silver and emerald green foliage in a sand colored textured terracotta pot, serene botanical studio setup with soft diffused warm linen light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA7abj6ZRXEeyQXjyMvKR3g3AdG36ePaMsKn-Okn74BSDL01Fly99RflehGBoKLqaIWoQs48l5dW9JXpVwP7HM16X__D67bGAagSyeM0s8yMmUgVrnPpC_PVJQyoOUC7wxEUzKhDx8gId1X9CN5IhZcCX4s8Wah1Xc6kBs05JD7wRzOs16AEQq2I6iEkQygZ44OTcR6dOAZAAkcSscyyfdCr5EMPyvb7Rj1mXVZFr-SlLFGAs89i7-4w">
+<!-- Badges Floating -->
+<div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px]">pets</span> Pet Safe
+            </span>
+</div>
+<!-- Favorite Wishlist Toggle -->
+<button aria-label="Add to wishlist" class="wishlist-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-on-surface-variant flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+<!-- Care Glyph Tags Over Image Bottom -->
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+<div class="flex items-center gap-1 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[13px]">filter_vintage</span>
+<span class="font-label-sm text-[10px] font-medium">Medium</span>
+</div>
+<div class="flex items-center gap-0.5 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[12px]">water_drop</span>
+<span class="material-symbols-outlined text-secondary text-[12px]">water_drop</span>
+</div>
+</div>
+</div>
+<!-- Product Content -->
+<div class="p-space-sm flex flex-col flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between gap-1 mb-0.5">
+<span class="font-label-sm text-[10px] text-outline font-semibold uppercase tracking-wider">Calathea</span>
+<div class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-[11px] font-bold text-on-surface">4.8</span>
+</div>
+</div>
+<h4 class="font-headline-sm text-[15px] leading-snug text-primary font-serif font-medium line-clamp-1">Calathea Orbifolia</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-1 mb-space-xs">Prayer Plant Family</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-outline">From</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold leading-none">$38</span>
+</div>
+<!-- Quick Add Button -->
+<button aria-label="Add Calathea to cart" class="add-to-cart-btn w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-[0_2px_8px_rgba(1,45,29,0.3)] hover:bg-primary-container">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 3: Snake Plant Laurentii -->
+<article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden transition-all hover:shadow-[0_8px_24px_-4px_rgba(27,67,50,0.12)]">
+<!-- Image Container with Badges & Wishlist -->
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105" data-alt="Sansevieria Snake Plant Laurentii with upright yellow-edged sword leaves potted in smooth sage green matte stoneware, clean architectural composition with soft sunlight shadows, interior catalog photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXkzV5HK6vRB4VLVchu9FXc87m7VnyAduiksYuz0RxTAzoSTDT2zLYMrxMCjNAZLj50J-Gla3zEDYaDqwq0MJD0_Uwahuq0igkzSad2KZvNsTK2d7oq5WRJHmhaAQTluVqR0xgrzILexK7Z6dTJO4vrjm-ZFTSVPdjkzJnSwAzMhpw8Wu2LtFK7c83JOE2biNjEAI26puyJytFXVn4BTfQeeqW5lgMsnLJhzLK0FE5jelBXD267Ln3mw">
+<!-- Badges Floating -->
+<div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+<span class="bg-surface-container-highest text-on-surface-variant font-label-sm text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
+              Low Light Hero
+            </span>
+</div>
+<!-- Favorite Wishlist Toggle -->
+<button aria-label="Add to wishlist" class="wishlist-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-on-surface-variant flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+<!-- Care Glyph Tags Over Image Bottom -->
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+<div class="flex items-center gap-1 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[13px]">wb_twilight</span>
+<span class="font-label-sm text-[10px] font-medium">Low/Any</span>
+</div>
+<div class="flex items-center gap-0.5 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[12px]">water_drop</span>
+</div>
+</div>
+</div>
+<!-- Product Content -->
+<div class="p-space-sm flex flex-col flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between gap-1 mb-0.5">
+<span class="font-label-sm text-[10px] text-outline font-semibold uppercase tracking-wider">Sansevieria</span>
+<div class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-[11px] font-bold text-on-surface">5.0</span>
+</div>
+</div>
+<h4 class="font-headline-sm text-[15px] leading-snug text-primary font-serif font-medium line-clamp-1">Snake Plant Laurentii</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-1 mb-space-xs">Mother-in-Law's Tongue</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-outline">From</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold leading-none">$28</span>
+</div>
+<!-- Quick Add Button -->
+<button aria-label="Add Snake Plant to cart" class="add-to-cart-btn w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-[0_2px_8px_rgba(1,45,29,0.3)] hover:bg-primary-container">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 4: Fiddle Leaf Fig (Bambino) -->
+<article class="flex flex-col bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(27,67,50,0.06)] overflow-hidden transition-all hover:shadow-[0_8px_24px_-4px_rgba(27,67,50,0.12)]">
+<!-- Image Container with Badges & Wishlist -->
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105" data-alt="Ficus Lyrata Bambino dwarf Fiddle Leaf Fig tree in an organic ribbed clay planter standing in an airy sun-drenched Scandinavian living room corner, crisp natural foliage photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6DStvkNBTRWzcPmW04dM4QrmeQbMo2FlRRw_wYSUBTXQHKnO3T_UuBJWq4RHBZDeXAG0tckGgHm1tLc3E2T1mFc8qtQYxivjO10s5qKJpK3T6AhoX7UHAU7fanYcTEoW0Cuqrs4lHaNEEMZvUnGNG3diriI1bWGXjuz3qprt0o-7Xa_sLbPZSaW9T0wMCsOfA7GB8Vn12n64EGbzC0M2c0ToPolOo0C2ZTWf-2p0PHYbuumMc87Subw">
+<!-- Badges Floating -->
+<div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+<span class="bg-primary-fixed text-on-primary-fixed font-label-sm text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
+              Air Purifier
+            </span>
+</div>
+<!-- Favorite Wishlist Toggle -->
+<button aria-label="Add to wishlist" class="wishlist-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-on-surface-variant flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+<!-- Care Glyph Tags Over Image Bottom -->
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+<div class="flex items-center gap-1 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[13px]">light_mode</span>
+<span class="font-label-sm text-[10px] font-medium">Bright</span>
+</div>
+<div class="flex items-center gap-0.5 bg-surface-container-lowest/90 backdrop-blur-md px-1.5 py-0.5 rounded-full text-on-surface shadow-xs">
+<span class="material-symbols-outlined text-secondary text-[12px]">water_drop</span>
+<span class="material-symbols-outlined text-secondary text-[12px]">water_drop</span>
+</div>
+</div>
+</div>
+<!-- Product Content -->
+<div class="p-space-sm flex flex-col flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between gap-1 mb-0.5">
+<span class="font-label-sm text-[10px] text-outline font-semibold uppercase tracking-wider">Ficus</span>
+<div class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-[11px] font-bold text-on-surface">4.7</span>
+</div>
+</div>
+<h4 class="font-headline-sm text-[15px] leading-snug text-primary font-serif font-medium line-clamp-1">Fiddle Leaf (Bambino)</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-1 mb-space-xs">Compact Lyre Tree</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-outline">From</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold leading-none">$55</span>
+</div>
+<!-- Quick Add Button -->
+<button aria-label="Add Fiddle Leaf Fig to cart" class="add-to-cart-btn w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform shadow-[0_2px_8px_rgba(1,45,29,0.3)] hover:bg-primary-container">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Interactive Plant Care Guarantee & Assistance Banner -->
+<section class="px-margin-mobile pt-space-lg pb-space-xl">
+<div class="rounded-xl bg-surface-container-low p-space-md flex items-center gap-space-md shadow-sm">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-headline-sm text-[15px] font-serif text-primary mb-0.5">30-Day Plant Guarantee</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Arrives healthy or replaced free. Includes lifelong botanical concierge care advice.</p>
+</div>
+</div>
+</section>
+<!-- Modal Bottom Sheet: Filter & Sort Drawer (Initially Hidden) -->
+<aside aria-hidden="true" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0" id="filter-drawer">
+<!-- Backdrop Blur Tint -->
+<div class="absolute inset-0 bg-primary/40 backdrop-blur-xs transition-opacity" id="filter-backdrop"></div>
+<!-- Drawer Sheet -->
+<div class="absolute bottom-0 inset-x-0 bg-surface-container-lowest rounded-t-2xl shadow-[0_-8px_32px_rgba(1,45,29,0.18)] max-h-[777px] flex flex-col transform translate-y-full transition-transform duration-300 pointer-events-auto" id="filter-sheet">
+<!-- Handle and Header -->
+<div class="pt-3 pb-2 px-space-md flex flex-col items-center border-b-0">
+<div class="w-10 h-1.5 rounded-full bg-surface-container-highest mb-3"></div>
+<div class="w-full flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-primary font-serif">Filters &amp; Sort</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] px-2 py-0.5 rounded-full font-bold">3 applied</span>
+</div>
+<button class="w-9 h-9 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface active:scale-95" id="filter-drawer-close">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+</div>
+<!-- Filter Segments Container -->
+<div class="overflow-y-auto px-space-md py-space-sm space-y-space-lg flex-1">
+<!-- Segment 1: Light Requirements -->
+<div>
+<label class="font-label-lg text-label-lg text-primary block mb-space-xs">Light Requirements</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm active:scale-98 text-left transition-colors">
+<span class="material-symbols-outlined text-secondary text-[18px]">wb_twilight</span>
+<span class="">Low Light</span>
+</button>
+<button class="flex items-center gap-2 p-2.5 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm active:scale-98 text-left transition-colors">
+<span class="material-symbols-outlined text-secondary-fixed text-[18px]">filter_vintage</span>
+<span class="font-medium">Bright Indirect</span>
+</button>
+<button class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm active:scale-98 text-left transition-colors">
+<span class="material-symbols-outlined text-secondary text-[18px]">wb_sunny</span>
+<span class="">Direct Sun</span>
+</button>
+<button class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm active:scale-98 text-left transition-colors">
+<span class="material-symbols-outlined text-secondary text-[18px]">fluorescent</span>
+<span class="">Fluorescent / Office</span>
+</button>
+</div>
+</div>
+<!-- Segment 2: Pet Safety Toggle -->
+<div class="flex items-center justify-between p-space-sm rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">pets</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-primary">Pet-Friendly Only</p>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Non-toxic to curious cats &amp; dogs</p>
+</div>
+</div>
+<!-- Toggle Switch Element -->
+<div class="w-12 h-7 bg-primary rounded-full p-1 flex items-center cursor-pointer justify-end transition-colors" id="pet-toggle">
+<div class="w-5 h-5 bg-surface-container-lowest rounded-full shadow-md"></div>
+</div>
+</div>
+<!-- Segment 3: Plant Size Scale -->
+<div>
+<label class="font-label-lg text-label-lg text-primary block mb-space-xs">Botanical Scale</label>
+<div class="flex items-center justify-between gap-2">
+<button class="flex-1 py-2 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md text-center hover:bg-surface-container">Small<br><span class="text-[10px] text-outline">4"-6"</span></button>
+<button class="flex-1 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md text-center">Medium<br><span class="text-[10px] text-secondary-fixed">7"-10"</span></button>
+<button class="flex-1 py-2 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md text-center hover:bg-surface-container">Large<br><span class="text-[10px] text-outline">10"-12"</span></button>
+<button class="flex-1 py-2 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md text-center hover:bg-surface-container">Floor<br><span class="text-[10px] text-outline">3ft+</span></button>
+</div>
+</div>
+<!-- Segment 4: Price Range Slider Preview -->
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<label class="font-label-lg text-label-lg text-primary">Price Range</label>
+<span class="font-label-md text-label-md text-primary font-bold">$20 - $75</span>
+</div>
+<div class="relative w-full h-6 flex items-center">
+<div class="w-full h-1.5 bg-surface-container-high rounded-full"></div>
+<div class="absolute left-1/4 right-1/4 h-1.5 bg-primary rounded-full"></div>
+<div class="absolute left-1/4 -ml-2.5 w-5 h-5 rounded-full bg-primary shadow-md"></div>
+<div class="absolute right-1/4 -mr-2.5 w-5 h-5 rounded-full bg-primary shadow-md"></div>
+</div>
+</div>
+</div>
+<!-- Sticky Filter Drawer Footer Actions -->
+<div class="p-space-md bg-surface-container-lowest border-t-0 shadow-[0_-4px_16px_rgba(27,67,50,0.04)] flex items-center gap-space-sm">
+<button class="px-space-md py-3 text-on-surface-variant font-label-lg text-label-lg active:scale-95 transition-transform" id="filter-reset-btn">
+          Reset All
+        </button>
+<button class="flex-1 py-3 bg-primary text-on-primary rounded-lg font-label-lg text-label-lg text-center shadow-md active:scale-98 transition-transform" id="filter-apply-btn">
+          Show 42 Plants
+        </button>
+</div>
+</div>
+</aside>
+<!-- Interactive Added to Cart Toast Banner -->
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 bg-primary text-on-primary px-space-md py-2.5 rounded-full shadow-[0_8px_24px_rgba(1,45,29,0.3)] flex items-center gap-2 transform translate-y-12 opacity-0 pointer-events-none transition-all duration-300" id="cart-toast">
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]">check_circle</span>
+<span class="font-label-md text-label-md">Added to plant tote</span>
+</div>
+</div>
+<script>
+  (function() {
+    // Drawer open / close mechanics
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterSheet = document.getElementById('filter-sheet');
+    const openBtn = document.getElementById('filter-drawer-open');
+    const closeBtn = document.getElementById('filter-drawer-close');
+    const backdrop = document.getElementById('filter-backdrop');
+    const applyBtn = document.getElementById('filter-apply-btn');
+
+    function openDrawer() {
+      filterDrawer.classList.remove('pointer-events-none', 'opacity-0');
+      filterDrawer.classList.add('pointer-events-auto', 'opacity-100');
+      filterSheet.classList.remove('translate-y-full');
+      filterSheet.classList.add('translate-y-0');
+    }
+
+    function closeDrawer() {
+      filterSheet.classList.remove('translate-y-0');
+      filterSheet.classList.add('translate-y-full');
+      filterDrawer.classList.remove('opacity-100');
+      filterDrawer.classList.add('opacity-0');
+      setTimeout(() => {
+        filterDrawer.classList.remove('pointer-events-auto');
+        filterDrawer.classList.add('pointer-events-none');
+      }, 300);
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
+
+    // Filter Chips interactive toggle
+    const chips = document.querySelectorAll('.filter-chip');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => {
+          c.classList.remove('bg-primary', 'text-on-primary');
+          c.classList.add('bg-surface-container-low', 'text-primary');
+        });
+        chip.classList.remove('bg-surface-container-low', 'text-primary');
+        chip.classList.add('bg-primary', 'text-on-primary');
+      });
+    });
+
+    // Wishlist Heart Micro-interaction
+    const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+    wishlistBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const icon = btn.querySelector('.material-symbols-outlined');
+        const isFilled = icon.style.fontVariationSettings && icon.style.fontVariationSettings.includes("'FILL' 1");
+        
+        if (isFilled) {
+          icon.style.fontVariationSettings = "'FILL' 0";
+          btn.classList.remove('text-error');
+          btn.classList.add('text-on-surface-variant');
+        } else {
+          icon.style.fontVariationSettings = "'FILL' 1";
+          btn.classList.remove('text-on-surface-variant');
+          btn.classList.add('text-error');
+        }
+      });
+    });
+
+    // Add to Cart Micro-interaction Toast
+    const addBtns = document.querySelectorAll('.add-to-cart-btn');
+    const toast = document.getElementById('cart-toast');
+    let toastTimeout;
+
+    addBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (toast) {
+          clearTimeout(toastTimeout);
+          toast.classList.remove('translate-y-12', 'opacity-0');
+          toast.classList.add('translate-y-0', 'opacity-100');
+
+          toastTimeout = setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-12', 'opacity-0');
+          }, 2000);
+        }
+      });
+    });
+
+    // Pet Safety Switch Interaction
+    const petToggle = document.getElementById('pet-toggle');
+    if (petToggle) {
+      petToggle.addEventListener('click', () => {
+        const circle = petToggle.firstElementChild;
+        if (petToggle.classList.contains('bg-primary')) {
+          petToggle.classList.remove('bg-primary', 'justify-end');
+          petToggle.classList.add('bg-surface-container-high', 'justify-start');
+        } else {
+          petToggle.classList.add('bg-primary', 'justify-end');
+          petToggle.classList.remove('bg-surface-container-high', 'justify-start');
+        }
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-4px_20px_rgba(27,67,50,0.06)]" data-active-classes="text-primary font-semibold"><div class="h-20 px-margin-mobile flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[4rem] h-14 transition-colors active:scale-95 gap-0.5 text-primary font-semibold" data-path="shop" href="#"><span class="material-symbols-outlined">potted_plant</span><span class="font-label-sm text-label-sm">Shop</span></a><a class="flex flex-col items-center justify-center min-w-[4rem] h-14 text-on-surface-variant transition-colors active:scale-95 gap-0.5" data-path="discover" href="#"><span class="material-symbols-outlined">explore</span><span class="font-label-sm text-label-sm">Discover</span></a><a class="flex flex-col items-center justify-center min-w-[4rem] h-14 text-on-surface-variant transition-colors active:scale-95 gap-0.5 relative" data-path="cart" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined">local_mall</span><span class="absolute -top-1 -right-2 min-w-[1.125rem] h-[1.125rem] px-1 bg-secondary text-on-secondary rounded-full font-label-sm text-[10px] flex items-center justify-center font-bold">2</span></div><span class="font-label-sm text-label-sm">Cart</span></a><a class="flex flex-col items-center justify-center min-w-[4rem] h-14 text-on-surface-variant transition-colors active:scale-95 gap-0.5" data-path="account" href="#"><span class="material-symbols-outlined">person_outline</span><span class="font-label-sm text-label-sm">Account</span></a></div></nav>
+
+</body></html>

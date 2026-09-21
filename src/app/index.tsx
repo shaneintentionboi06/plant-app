@@ -1,98 +1,110 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { View, StyleSheet, SafeAreaView, Platform } from 'react-native';
+import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { HomeScreen } from '@/screens/HomeScreen';
+import { ProductDetailsScreen } from '@/screens/ProductDetailsScreen';
+import { CartScreen } from '@/screens/CartScreen';
+import { AccountScreen } from '@/screens/AccountScreen';
+import { LocationZoneModal } from '@/screens/LocationZoneModal';
+import { PlantSpecimen, PLANTS_DATA } from '@/data/plants';
+import { Colors } from '@/constants/theme';
+import { useResponsive } from '@/hooks/useResponsive';
+import { useZoneStore } from '@/store/useZoneStore';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function BotanicalApp() {
+  const { isDesktop } = useResponsive();
+  const openZonePicker = useZoneStore((s) => s.openZonePicker);
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  const [currentTab, setCurrentTab] = useState<'catalog' | 'cart' | 'account' | 'details'>('catalog');
+  const [selectedPlant, setSelectedPlant] = useState<PlantSpecimen | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSelectPlant = (plant: PlantSpecimen) => {
+    setSelectedPlant(plant);
+    setCurrentTab('details');
+  };
+
+  const handleSelectPlantById = (id: string) => {
+    const found = PLANTS_DATA.find((p) => p.id === id);
+    if (found) {
+      setSelectedPlant(found);
+      setCurrentTab('details');
+    }
+  };
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.appContainer}>
+        {/* Universal Top Header */}
+        <Header
+          currentTab={currentTab}
+          onSelectTab={(tab) => {
+            if (tab === 'catalog' || tab === 'cart' || tab === 'account') {
+              setCurrentTab(tab);
+            }
+          }}
+          searchQuery={searchQuery}
+          onSearchChange={(q) => {
+            setSearchQuery(q);
+            if (currentTab !== 'catalog') setCurrentTab('catalog');
+          }}
+        />
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        {/* Dynamic Screen Switcher */}
+        <View style={styles.mainContent}>
+          {currentTab === 'details' && selectedPlant ? (
+            <ProductDetailsScreen
+              plant={selectedPlant}
+              onBack={() => setCurrentTab('catalog')}
+              onGoToCart={() => setCurrentTab('cart')}
+            />
+          ) : currentTab === 'cart' ? (
+            <CartScreen
+              onContinueShopping={() => setCurrentTab('catalog')}
+              onSelectPlantById={handleSelectPlantById}
+            />
+          ) : currentTab === 'account' ? (
+            <AccountScreen />
+          ) : (
+            <HomeScreen
+              onSelectPlant={handleSelectPlant}
+              searchQuery={searchQuery}
+            />
+          )}
+        </View>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+        {/* Mobile Bottom Navigation (Hidden on Desktop) */}
+        {!isDesktop && (
+          <BottomNav
+            currentTab={currentTab}
+            onSelectTab={(tab) => {
+              if (tab === 'catalog' || tab === 'cart' || tab === 'account') {
+                setCurrentTab(tab);
+              }
+            }}
+            onOpenZonePicker={openZonePicker}
           />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        )}
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        {/* Global Growing Zone Modal */}
+        <LocationZoneModal />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    backgroundColor: Colors.surface,
+    paddingTop: Platform.OS === 'android' ? 24 : 0,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  appContainer: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    backgroundColor: Colors.surface,
   },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  mainContent: {
+    flex: 1,
   },
 });
