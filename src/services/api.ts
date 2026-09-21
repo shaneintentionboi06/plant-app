@@ -2,7 +2,7 @@
 // Provides typed asynchronous endpoints conforming to the REST API specification
 // Supports connection to live remote backend or dynamic in-memory seed service
 
-import { PLANTS_DATA, USDA_ZONES, PlantSpecimen } from '../data/plants';
+import { PLANTS_DATA, GROWING_ZONES, PlantSpecimen } from '../data/plants';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || '';
 
@@ -39,7 +39,7 @@ export const ApiService = {
       if (filters.category === 'pet-friendly') results = results.filter((p) => p.petSafe);
       if (filters.category === 'air-purifying') results = results.filter((p) => p.airPurifying);
       if (filters.category === 'easy-care') results = results.filter((p) => p.easyCare);
-      if (filters.category === 'under-35') results = results.filter((p) => p.price <= 35);
+      if (filters.category === 'under-3000') results = results.filter((p) => p.price <= 3000);
       if (filters.category === 'trees') results = results.filter((p) => p.tree);
     }
 
@@ -84,9 +84,9 @@ export const ApiService = {
   // 3. Location Lookup
   lookupLocation: async (query: string) => {
     const q = query.trim().toLowerCase();
-    const match = USDA_ZONES.find(
+    const match = GROWING_ZONES.find(
       (z) => z.zip.includes(q) || z.city.toLowerCase().includes(q) || z.zone.toLowerCase() === q
     );
-    return match || USDA_ZONES[0];
+    return match || GROWING_ZONES[0];
   },
 };

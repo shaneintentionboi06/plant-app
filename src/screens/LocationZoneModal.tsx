@@ -12,7 +12,7 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { useZoneStore } from '../store/useZoneStore';
-import { USDA_ZONES } from '../data/plants';
+import { GROWING_ZONES } from '../data/plants';
 
 export const LocationZoneModal: React.FC = () => {
   const {
@@ -20,23 +20,22 @@ export const LocationZoneModal: React.FC = () => {
     closeZonePicker,
     currentZone,
     currentCity,
-    currentZip,
     setZone,
   } = useZoneStore();
 
   const [searchInput, setSearchInput] = useState('');
 
   const activeZoneData =
-    USDA_ZONES.find((z) => z.zone === currentZone) || USDA_ZONES[0];
+    GROWING_ZONES.find((z) => z.zone === currentZone) || GROWING_ZONES[0];
 
-  const handleSelectZone = (z: (typeof USDA_ZONES)[0]) => {
+  const handleSelectZone = (z: (typeof GROWING_ZONES)[0]) => {
     setZone(z.zone, z.city, z.zip);
   };
 
   const handleCustomSearch = () => {
     const q = searchInput.trim().toLowerCase();
     if (!q) return;
-    const found = USDA_ZONES.find(
+    const found = GROWING_ZONES.find(
       (z) => z.zip.includes(q) || z.city.toLowerCase().includes(q) || z.zone.toLowerCase() === q
     );
     if (found) {
@@ -63,6 +62,7 @@ export const LocationZoneModal: React.FC = () => {
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={closeZonePicker}
+              accessibilityRole="button"
               accessibilityLabel="Close modal"
             >
               <Ionicons name="close" size={20} color={Colors.onSurface} />
@@ -72,7 +72,7 @@ export const LocationZoneModal: React.FC = () => {
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
             {/* Context Subtitle */}
             <Text style={styles.subtitle}>
-              We calibrate botanical recommendations to your local USDA Hardiness Zone, minimum winter temperatures, and ambient coastal humidity.
+              We calibrate botanical recommendations to your Indian growing zone, monsoon humidity, and local winter minimums.
             </Text>
 
             {/* Current Active Zone Banner */}
@@ -81,7 +81,7 @@ export const LocationZoneModal: React.FC = () => {
                 <View>
                   <Text style={styles.activeZoneTag}>Current Region</Text>
                   <Text style={styles.activeZoneCity}>{currentCity}</Text>
-                  <Text style={styles.activeZoneCode}>USDA Hardiness Zone {currentZone}</Text>
+                  <Text style={styles.activeZoneCode}>Growing Zone {currentZone}</Text>
                 </View>
                 <View style={styles.badgeCircle}>
                   <Text style={styles.badgeCircleText}>{currentZone}</Text>
@@ -92,11 +92,11 @@ export const LocationZoneModal: React.FC = () => {
 
             {/* Search Input Bar */}
             <View style={styles.searchSection}>
-              <Text style={styles.searchLabel}>Search Zip Code or City</Text>
+              <Text style={styles.searchLabel}>Search PIN Code or City</Text>
               <View style={styles.searchRow}>
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="e.g. 94103 or Seattle"
+                  placeholder="e.g. 400001 or Mumbai"
                   placeholderTextColor={Colors.outline}
                   value={searchInput}
                   onChangeText={setSearchInput}
@@ -105,6 +105,8 @@ export const LocationZoneModal: React.FC = () => {
                 <TouchableOpacity
                   style={styles.searchBtn}
                   onPress={handleCustomSearch}
+                  accessibilityRole="button"
+                  accessibilityLabel="Search location"
                 >
                   <Ionicons name="search" size={16} color={Colors.onPrimary} />
                 </TouchableOpacity>
@@ -115,7 +117,7 @@ export const LocationZoneModal: React.FC = () => {
             <View style={styles.presetsSection}>
               <Text style={styles.presetsTitle}>Regional Climate Presets</Text>
               <View style={styles.presetsList}>
-                {USDA_ZONES.map((z) => {
+                {GROWING_ZONES.map((z) => {
                   const isCurrent = currentZone === z.zone;
                   return (
                     <TouchableOpacity
@@ -123,6 +125,9 @@ export const LocationZoneModal: React.FC = () => {
                       style={[styles.presetItem, isCurrent && styles.presetItemActive]}
                       onPress={() => handleSelectZone(z)}
                       activeOpacity={0.8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select ${z.city}, zone ${z.zone}`}
+                      accessibilityState={{ selected: isCurrent }}
                     >
                       <View style={styles.presetLeft}>
                         <View style={[styles.zonePill, isCurrent && styles.zonePillActive]}>
@@ -157,6 +162,8 @@ export const LocationZoneModal: React.FC = () => {
               style={styles.applyButton}
               onPress={closeZonePicker}
               activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Apply and calibrate catalog"
             >
               <Text style={styles.applyButtonText}>Apply & Calibrate Catalog</Text>
             </TouchableOpacity>

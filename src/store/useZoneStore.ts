@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { USDA_ZONES } from '../data/plants';
 
 interface ZoneState {
   currentZone: string;
@@ -13,9 +12,9 @@ interface ZoneState {
 }
 
 export const useZoneStore = create<ZoneState>((set) => ({
-  currentZone: '10a',
-  currentCity: 'San Francisco, CA',
-  currentZip: '94103',
+  currentZone: '13a',
+  currentCity: 'Mumbai, MH',
+  currentZip: '400001',
   isZonePickerOpen: false,
 
   setZone: (zone, city, zip) =>

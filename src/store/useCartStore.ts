@@ -43,8 +43,9 @@ interface CartState {
   getItemCount: () => number;
 }
 
-const FREE_SHIPPING_THRESHOLD = 50.00;
-const STANDARD_SHIPPING_FEE = 8.00;
+export const FREE_SHIPPING_THRESHOLD = 2999;
+export const STANDARD_SHIPPING_FEE = 149;
+export const GST_RATE = 0.18; // 18% Indian GST
 
 export const useCartStore = create<CartState>((set, get) => ({
   // Initialize with the 2 items from the Stitch cart mockup!
@@ -162,7 +163,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     const subtotal = get().getSubtotal();
     const discount = get().getDiscount();
     const shipping = get().getShippingFee();
-    const tax = (subtotal - discount) * 0.085; // 8.5% CA sales tax
+    const tax = (subtotal - discount) * GST_RATE; // 18% Indian GST
     return Math.max(0, subtotal - discount + shipping + tax);
   },
 
