@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ARTICLES, articleImage, Article } from '../data/articles';
-import { PLANTS_DATA, PlantSpecimen } from '../data/plants';
+import { PlantSpecimen } from '../data/plants';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { formatINR } from '../utils/currency';
 import { useResponsive } from '../hooks/useResponsive';
 import { useCartStore } from '../store/useCartStore';
+import { usePlantsStore } from '../store/usePlantsStore';
 
 interface ArticleScreenProps {
   slug: string;
@@ -24,24 +25,24 @@ interface ArticleScreenProps {
   onGoToCart: () => void;
 }
 
-function resolveRelatedPlant(article: Article): PlantSpecimen {
+function resolveRelatedPlant(article: Article, plants: PlantSpecimen[]): PlantSpecimen {
   if (article.relatedPlantId) {
-    const direct = PLANTS_DATA.find((p) => p.id === article.relatedPlantId);
+    const direct = plants.find((p) => p.id === article.relatedPlantId);
     if (direct) return direct;
   }
   if (article.category === 'Pet Friendly') {
-    const safe = PLANTS_DATA.find((p) => p.petSafe);
+    const safe = plants.find((p) => p.petSafe);
     if (safe) return safe;
   }
   if (article.category === 'Beginner') {
-    const easy = PLANTS_DATA.find((p) => p.easyCare);
+    const easy = plants.find((p) => p.easyCare);
     if (easy) return easy;
   }
   if (article.category === 'Home') {
-    const low = PLANTS_DATA.find((p) => p.lowLight);
+    const low = plants.find((p) => p.lowLight);
     if (low) return low;
   }
-  return PLANTS_DATA[0];
+  return plants[0];
 }
 
 export const ArticleScreen: React.FC<ArticleScreenProps> = ({
@@ -53,10 +54,11 @@ export const ArticleScreen: React.FC<ArticleScreenProps> = ({
 }) => {
   const { isDesktop } = useResponsive();
   const addItem = useCartStore((s) => s.addItem);
+  const plants = usePlantsStore((s) => s.plants);
   const [added, setAdded] = useState(false);
 
   const article = ARTICLES.find((a) => a.slug === slug) || ARTICLES[0];
-  const plant = resolveRelatedPlant(article);
+  const plant = resolveRelatedPlant(article, plants);
   const related = [
     ...ARTICLES.filter((a) => a.slug !== article.slug && a.category === article.category),
     ...ARTICLES.filter((a) => a.slug !== article.slug && a.category !== article.category),

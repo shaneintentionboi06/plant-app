@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -245,11 +245,6 @@ export const Header: React.FC<HeaderProps> = ({
                 } as any)
               : {})}
           >
-            onPress={() => onSelectTab('account')}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="My account and greenhouse"
-          >
             <Image
               source={{ uri: user.avatarUrl }}
               style={styles.avatarImage}
@@ -466,14 +461,6 @@ const styles = StyleSheet.create({
     color: Colors.onSecondary,
     fontSize: 10,
     fontWeight: '700',
-  },
-  avatarButton: {
-    width: 36,
-    height: 36,
-    borderRadius: Radii.full,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: Colors.secondaryTender,
   },
   avatarImage: {
     width: '100%',

@@ -26,11 +26,12 @@ import {
   Footer,
 } from '../components/HomeSections';
 import type { HomeSection } from '../components/Header';
-import { PLANTS_DATA, PlantSpecimen } from '../data/plants';
+import { PlantSpecimen } from '../data/plants';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { useResponsive } from '../hooks/useResponsive';
 import { useZoneStore } from '../store/useZoneStore';
 import { useWishlistStore } from '../store/useWishlistStore';
+import { usePlantsStore } from '../store/usePlantsStore';
 
 export interface SectionRequest {
   section: HomeSection;
@@ -83,6 +84,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const { isDesktop, numColumns } = useResponsive();
   const { currentZone, currentCity, openZonePicker } = useZoneStore();
   const wishlistIds = useWishlistStore((s) => s.wishlistIds);
+  const plants = usePlantsStore((s) => s.plants);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Finder: live draft + applied set (applied on "Find My Plants")
@@ -113,26 +115,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   // Live match count for the finder UI (based on draft + zone)
   const draftMatchCount = useMemo(
-    () => PLANTS_DATA.filter((p) => matchesFinder(p, finderDraft)).length,
-    [finderDraft]
+    () => plants.filter((p) => matchesFinder(p, finderDraft)).length,
+    [plants, finderDraft]
   );
 
   // Personalized recommendations: applied finder prefs, sorted by zone match
   const recommendations = useMemo(() => {
     const base = hasPrefs(appliedFinder)
-      ? PLANTS_DATA.filter((p) => matchesFinder(p, appliedFinder))
-      : PLANTS_DATA.filter((p) => (p.zoneMatchPercent[currentZone] || 80) >= 90);
+      ? plants.filter((p) => matchesFinder(p, appliedFinder))
+      : plants.filter((p) => (p.zoneMatchPercent[currentZone] || 80) >= 90);
     return [...base]
       .sort(
         (a, b) =>
           (b.zoneMatchPercent[currentZone] || 80) - (a.zoneMatchPercent[currentZone] || 80)
       )
       .slice(0, 4);
-  }, [appliedFinder, currentZone]);
+  }, [plants, appliedFinder, currentZone]);
 
   // Catalog grid: search + chips + wishlist + applied finder (reuses one pipeline)
   const filteredPlants = useMemo(() => {
-    let list = [...PLANTS_DATA];
+    let list = [...plants];
 
     if (wishlistOnly) {
       list = list.filter((p) => wishlistIds.includes(p.id));
@@ -163,7 +165,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     }
 
     return list;
-  }, [selectedCategory, searchQuery, wishlistOnly, wishlistIds, appliedFinder]);
+  }, [plants, selectedCategory, searchQuery, wishlistOnly, wishlistIds, appliedFinder]);
 
   const handleApplyFinder = () => {
     setAppliedFinder({ ...finderDraft });
@@ -195,7 +197,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             onExplore={() => go('shop')}
             onFindPlant={() => go('finder')}
             onSelectFeatured={(id) => {
-              const plant = PLANTS_DATA.find((p) => p.id === id);
+              const plant = plants.find((p) => p.id === id);
               if (plant) onSelectPlant(plant);
             }}
             onNavigate={(s) => go(s)}

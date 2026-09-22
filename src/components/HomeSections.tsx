@@ -11,11 +11,12 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { useResponsive } from '../hooks/useResponsive';
-import { PLANTS_DATA, PlantSpecimen } from '../data/plants';
+import { PlantSpecimen } from '../data/plants';
 import { ARTICLES, ARTICLE_CATEGORIES, ArticleCategory, articleImage } from '../data/articles';
 import type { HomeSection } from './Header';
 import { PlantCard } from './PlantCard';
 import { useAuthStore } from '../store/useAuthStore';
+import { usePlantsStore } from '../store/usePlantsStore';
 
 // ---------- Shared section heading ----------
 
@@ -114,22 +115,23 @@ export const FeaturedPlants: React.FC<{
 }> = ({ onSelectPlant }) => {
   const { isDesktop, numColumns } = useResponsive();
   const [tab, setTab] = useState<FeaturedTab>('best');
+  const allPlants = usePlantsStore((s) => s.plants);
 
   const plants = useMemo(() => {
     switch (tab) {
       case 'best':
-        return PLANTS_DATA.filter((p) => p.bestseller).concat(
-          PLANTS_DATA.filter((p) => !p.bestseller)
+        return allPlants.filter((p) => p.bestseller).concat(
+          allPlants.filter((p) => !p.bestseller)
         ).slice(0, 4);
       case 'rare':
-        return [...PLANTS_DATA].sort((a, b) => b.rating - a.rating).slice(0, 4);
+        return [...allPlants].sort((a, b) => b.rating - a.rating).slice(0, 4);
       case 'beginner':
-        return PLANTS_DATA.filter((p) => p.easyCare).slice(0, 4);
+        return allPlants.filter((p) => p.easyCare).slice(0, 4);
       case 'new':
       default:
-        return [...PLANTS_DATA].reverse().slice(0, 4);
+        return [...allPlants].reverse().slice(0, 4);
     }
-  }, [tab]);
+  }, [allPlants, tab]);
 
   return (
     <View>
