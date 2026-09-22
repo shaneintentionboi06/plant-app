@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import { Header, HomeSection } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -8,14 +8,21 @@ import { ProductDetailsScreen } from '@/screens/ProductDetailsScreen';
 import { CartScreen } from '@/screens/CartScreen';
 import { AccountScreen } from '@/screens/AccountScreen';
 import { LocationZoneModal } from '@/screens/LocationZoneModal';
-import { PlantSpecimen, PLANTS_DATA } from '@/data/plants';
+import { PlantSpecimen } from '@/data/plants';
 import { Colors } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useZoneStore } from '@/store/useZoneStore';
+import { usePlantsStore } from '@/store/usePlantsStore';
 
 export default function BotanicalApp() {
   const { isDesktop } = useResponsive();
   const openZonePicker = useZoneStore((s) => s.openZonePicker);
+  const plants = usePlantsStore((s) => s.plants);
+  const fetchPlants = usePlantsStore((s) => s.fetchPlants);
+
+  useEffect(() => {
+    fetchPlants();
+  }, [fetchPlants]);
 
   const [currentTab, setCurrentTab] = useState<'catalog' | 'cart' | 'account' | 'details' | 'article'>('catalog');
   const [selectedPlant, setSelectedPlant] = useState<PlantSpecimen | null>(null);
@@ -30,7 +37,7 @@ export default function BotanicalApp() {
   };
 
   const handleSelectPlantById = (id: string) => {
-    const found = PLANTS_DATA.find((p) => p.id === id);
+    const found = plants.find((p) => p.id === id);
     if (found) {
       setSelectedPlant(found);
       setCurrentTab('details');

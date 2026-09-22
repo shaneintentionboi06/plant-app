@@ -11,7 +11,8 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { useResponsive } from '../hooks/useResponsive';
-import { PLANTS_DATA, PlantSpecimen } from '../data/plants';
+import { PlantSpecimen } from '../data/plants';
+import { usePlantsStore } from '../store/usePlantsStore';
 
 export type HeroMiniSection = 'shop' | 'finder' | 'journal' | 'greenhouse';
 
@@ -31,6 +32,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 }) => {
   const { isDesktop, isTablet, isMobile } = useResponsive();
   const isWide = isDesktop || isTablet;
+  const plants = usePlantsStore((s) => s.plants);
 
   // Subtle interactive hover state for web
   const [hoveredCta, setHoveredCta] = useState<'primary' | 'secondary' | null>(null);
@@ -59,19 +61,19 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   // Featured specimens from live catalog
   const primaryPlant = useMemo<PlantSpecimen>(() => {
     return (
-      PLANTS_DATA.find((p) => p.id === 'fiddle-leaf-fig') ||
-      PLANTS_DATA.find((p) => p.id === 'monstera-deliciosa') ||
-      PLANTS_DATA[0]
+      plants.find((p) => p.id === 'fiddle-leaf-fig') ||
+      plants.find((p) => p.id === 'monstera-deliciosa') ||
+      plants[0]
     );
-  }, []);
+  }, [plants]);
 
   const secondaryPlant = useMemo<PlantSpecimen>(() => {
     return (
-      PLANTS_DATA.find((p) => p.id === 'calathea-orbifolia') ||
-      PLANTS_DATA.find((p) => p.id === 'monstera-adansonii') ||
-      PLANTS_DATA[1]
+      plants.find((p) => p.id === 'calathea-orbifolia') ||
+      plants.find((p) => p.id === 'monstera-adansonii') ||
+      plants[1]
     );
-  }, []);
+  }, [plants]);
 
   return (
     <View style={styles.stage}>
