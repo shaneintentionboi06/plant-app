@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
-import { useCartStore } from '../store/useCartStore';
+import { useCartStore, GST_RATE } from '../store/useCartStore';
+import { formatINR, formatINRExact } from '../utils/currency';
 import { useResponsive } from '../hooks/useResponsive';
 
 interface CartScreenProps {
@@ -107,6 +108,8 @@ export const CartScreen: React.FC<CartScreenProps> = ({
         <TouchableOpacity
           style={styles.exploreBtn}
           onPress={onContinueShopping}
+          accessibilityRole="button"
+          accessibilityLabel="Explore plants"
         >
           <Text style={styles.exploreBtnText}>Explore Plants</Text>
           <Ionicons name="arrow-forward" size={16} color={Colors.onPrimary} />
@@ -134,7 +137,12 @@ export const CartScreen: React.FC<CartScreenProps> = ({
             </View>
           </View>
 
-          <TouchableOpacity onPress={clearCart} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={clearCart}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Clear cart"
+          >
             <Text style={styles.clearAllText}>Clear all</Text>
           </TouchableOpacity>
         </View>
@@ -148,7 +156,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({
             </View>
             <Text style={styles.shippingGoalText}>
               {amountToFree > 0
-                ? `Add $${amountToFree.toFixed(2)} for Free Shipping`
+                ? `Add ${formatINR(amountToFree)} for Free Shipping`
                 : 'Free Shipping Unlocked!'}
             </Text>
           </View>
@@ -210,6 +218,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                     <TouchableOpacity
                       style={styles.removeBtn}
                       onPress={() => removeItem(item.id)}
+                      accessibilityRole="button"
                       accessibilityLabel="Remove item"
                     >
                       <Ionicons name="close" size={18} color={Colors.outline} />
@@ -224,13 +233,15 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                   {/* Price & Quantity Adjuster */}
                   <View style={styles.itemBottomRow}>
                     <Text style={styles.itemPrice}>
-                      ${(item.unitPrice * item.quantity).toFixed(2)}
+                      {formatINR(item.unitPrice * item.quantity)}
                     </Text>
 
                     <View style={styles.quantityControls}>
                       <TouchableOpacity
                         style={styles.qtyControlBtn}
                         onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Decrease quantity of ${item.plant.name}`}
                       >
                         <Ionicons name="remove" size={14} color={Colors.onSurface} />
                       </TouchableOpacity>
@@ -238,6 +249,8 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                       <TouchableOpacity
                         style={styles.qtyControlBtn}
                         onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Increase quantity of ${item.plant.name}`}
                       >
                         <Ionicons name="add" size={14} color={Colors.onSurface} />
                       </TouchableOpacity>
@@ -266,6 +279,8 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                   style={styles.applyBtn}
                   onPress={handleApplyCode}
                   activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Apply promo code"
                 >
                   <Text style={styles.applyBtnText}>Apply</Text>
                 </TouchableOpacity>
@@ -294,7 +309,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({
 
               <View style={styles.summaryLine}>
                 <Text style={styles.summaryLineLabel}>Subtotal</Text>
-                <Text style={styles.summaryLineValue}>${subtotal.toFixed(2)}</Text>
+                <Text style={styles.summaryLineValue}>{formatINR(subtotal)}</Text>
               </View>
 
               {discount > 0 && (
@@ -303,7 +318,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                     Eco-Promotion Discount
                   </Text>
                   <Text style={[styles.summaryLineValue, { color: Colors.secondary }]}>
-                    -${discount.toFixed(2)}
+                    -{formatINR(discount)}
                   </Text>
                 </View>
               )}
@@ -314,15 +329,15 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                   {shipping === 0 ? (
                     <Text style={{ color: Colors.secondary, fontWeight: '700' }}>FREE</Text>
                   ) : (
-                    `$${shipping.toFixed(2)}`
+                    formatINR(shipping)
                   )}
                 </Text>
               </View>
 
               <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>Estimated CA Sales Tax (8.5%)</Text>
+                <Text style={styles.summaryLineLabel}>GST (18%)</Text>
                 <Text style={styles.summaryLineValue}>
-                  ${((subtotal - discount) * 0.085).toFixed(2)}
+                  {formatINRExact((subtotal - discount) * GST_RATE)}
                 </Text>
               </View>
 
@@ -330,7 +345,7 @@ export const CartScreen: React.FC<CartScreenProps> = ({
 
               <View style={styles.totalLine}>
                 <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+                <Text style={styles.totalValue}>{formatINRExact(total)}</Text>
               </View>
 
               {/* Checkout CTA Button */}
@@ -338,6 +353,8 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                 style={styles.checkoutBtn}
                 activeOpacity={0.85}
                 onPress={handleCheckout}
+                accessibilityRole="button"
+                accessibilityLabel="Proceed to checkout"
               >
                 <Text style={styles.checkoutBtnText}>
                   Proceed to Climate Checkout

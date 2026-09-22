@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,305 +6,845 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  Animated,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { useResponsive } from '../hooks/useResponsive';
-import { useZoneStore } from '../store/useZoneStore';
+import { PLANTS_DATA, PlantSpecimen } from '../data/plants';
+
+export type HeroMiniSection = 'shop' | 'finder' | 'journal' | 'greenhouse';
 
 interface HeroBannerProps {
   onExplore: () => void;
+  onFindPlant: () => void;
   onSelectFeatured: (plantId: string) => void;
+  onNavigate?: (section: HeroMiniSection) => void;
+  onOpenCart?: () => void;
+  onOpenGreenhouse?: () => void;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   onExplore,
+  onFindPlant,
   onSelectFeatured,
 }) => {
-  const { isDesktop } = useResponsive();
-  const { openZonePicker } = useZoneStore();
+  const { isDesktop, isTablet, isMobile } = useResponsive();
+  const isWide = isDesktop || isTablet;
+
+  // Subtle interactive hover state for web
+  const [hoveredCta, setHoveredCta] = useState<'primary' | 'secondary' | null>(null);
+  const [isImageHovered, setIsImageHovered] = useState(false);
+  const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
+  const [isBottomHovered, setIsBottomHovered] = useState(false);
+
+  // Staggered page-load entrance animation
+  const headingAnim = useRef(new Animated.Value(Platform.OS === 'web' ? 1 : 0)).current;
+  const copyAnim = useRef(new Animated.Value(Platform.OS === 'web' ? 1 : 0)).current;
+  const ctaAnim = useRef(new Animated.Value(Platform.OS === 'web' ? 1 : 0)).current;
+  const imageAnim = useRef(new Animated.Value(Platform.OS === 'web' ? 1 : 0)).current;
+  const cardsAnim = useRef(new Animated.Value(Platform.OS === 'web' ? 1 : 0)).current;
+
+  useEffect(() => {
+    // Smooth, restrained entrance sequence
+    Animated.stagger(90, [
+      Animated.timing(headingAnim, { toValue: 1, duration: 450, useNativeDriver: true }),
+      Animated.timing(copyAnim, { toValue: 1, duration: 420, useNativeDriver: true }),
+      Animated.timing(ctaAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(imageAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.timing(cardsAnim, { toValue: 1, duration: 450, useNativeDriver: true }),
+    ]).start();
+  }, [headingAnim, copyAnim, ctaAnim, imageAnim, cardsAnim]);
+
+  // Featured specimens from live catalog
+  const primaryPlant = useMemo<PlantSpecimen>(() => {
+    return (
+      PLANTS_DATA.find((p) => p.id === 'fiddle-leaf-fig') ||
+      PLANTS_DATA.find((p) => p.id === 'monstera-deliciosa') ||
+      PLANTS_DATA[0]
+    );
+  }, []);
+
+  const secondaryPlant = useMemo<PlantSpecimen>(() => {
+    return (
+      PLANTS_DATA.find((p) => p.id === 'calathea-orbifolia') ||
+      PLANTS_DATA.find((p) => p.id === 'monstera-adansonii') ||
+      PLANTS_DATA[1]
+    );
+  }, []);
 
   return (
-    <View style={styles.heroWrapper}>
-      <View style={[styles.heroCard, isDesktop && styles.desktopHeroCard]}>
-        {/* Ambient Overlay Image */}
-        <Image
-          source={{
-            uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCXmSkk3cOR2yR5OFJpxGu9slmY2QQUpBj6ZnbICO6FFfAxwk67lsTq1-b_zrbKXcyhzh7dD1K3Ar7XV3eS3lca8NW1TdeWUtGdbGGBPkvdx0whJ42_A1bmbIG1mfeZbT5sFnNe6bgZLjw7dDCU1mHzKeVls2TBNbC-SEWA7g63N67boUqFPJIDuVk20ppmQYFj5UB768nzXi1xWRZYG9aNI1qlAfuJsANgYz9P6uoSRctjXbkPutfTQA',
-          }}
-          style={styles.backgroundImage}
-          blurRadius={Platform.OS === 'web' ? 2 : 0}
-        />
-        <View style={styles.scrimOverlay} />
+    <View style={styles.stage}>
+      <View
+        style={[
+          styles.card,
+          isWide && styles.cardDesktop,
+          isTablet && styles.cardTablet,
+        ]}
+      >
+        {/* Soft botanical ambient aura in background */}
+        <View style={styles.ambientAuraTop} pointerEvents="none" />
+        <View style={styles.ambientAuraRight} pointerEvents="none" />
 
-        <View style={[styles.contentLayout, isDesktop && styles.desktopLayout]}>
-          {/* Left Column: Editorial Copy */}
-          <View style={[styles.textColumn, isDesktop && styles.desktopTextColumn]}>
-            <View style={styles.releasePill}>
-              <MaterialCommunityIcons name="leaf" size={14} color={Colors.secondaryContainer} />
-              <Text style={styles.releasePillText}>Spring Botanical Release • Vol. 04</Text>
-            </View>
+        {/* Main Hero Body */}
+        <View
+          style={[
+            styles.heroBody,
+            isWide && styles.heroBodyDesktop,
+            isTablet && styles.heroBodyTablet,
+          ]}
+        >
+          {/* LEFT CONTENT AREA */}
+          <View
+            style={[
+              styles.copyColumn,
+              isWide && styles.copyColumnDesktop,
+              isTablet && styles.copyColumnTablet,
+            ]}
+          >
+            {/* Eyebrow */}
+            <Animated.View style={[styles.eyebrowRow, { opacity: headingAnim }]}>
+              <MaterialCommunityIcons name="leaf" size={14} color={Colors.secondary} />
+              <Text style={styles.eyebrowText}>CURATED FOR YOUR SPACE</Text>
+            </Animated.View>
 
-            <Text style={[styles.heroHeadline, isDesktop && styles.desktopHeadline]}>
-              Cultivate Calm in Your Sanctuary.
-            </Text>
+            {/* Main Heading */}
+            <Animated.View style={{ opacity: headingAnim }}>
+              <Text
+                style={[
+                  styles.heading,
+                  isWide && styles.headingDesktop,
+                  isTablet && styles.headingTablet,
+                ]}
+              >
+                Bring Nature&apos;s{'\n'}Beauty <Text style={styles.headingAccent}>Home.</Text>
+              </Text>
+            </Animated.View>
 
-            <Text style={styles.heroSubtext}>
-              20% off rare botanical aroids & handcrafted terracotta vessels. Sustainably nurtured, climate-matched to thrive in your exact living space.
-            </Text>
+            {/* Supporting Text */}
+            <Animated.View style={{ opacity: copyAnim }}>
+              <Text
+                style={[
+                  styles.supportingText,
+                  isWide && styles.supportingTextDesktop,
+                  isTablet && styles.supportingTextTablet,
+                ]}
+              >
+                Discover beautiful indoor plants selected for your space, lifestyle and growing conditions.
+              </Text>
+            </Animated.View>
 
-            {/* CTAs */}
-            <View style={styles.ctaRow}>
+            {/* Distinct CTAs */}
+            <Animated.View style={[styles.ctaRow, { opacity: ctaAnim }]}>
               <TouchableOpacity
-                style={styles.primaryButton}
-                activeOpacity={0.85}
+                style={[
+                  styles.primaryCta,
+                  hoveredCta === 'primary' && styles.primaryCtaHovered,
+                ]}
                 onPress={onExplore}
+                activeOpacity={0.9}
+                accessibilityRole="button"
+                accessibilityLabel="Explore Plants"
+                {...(Platform.OS === 'web'
+                  ? ({
+                      onMouseEnter: () => setHoveredCta('primary'),
+                      onMouseLeave: () => setHoveredCta(null),
+                    } as any)
+                  : {})}
               >
-                <Text style={styles.primaryButtonText}>Explore The Drop</Text>
-                <Ionicons name="arrow-forward" size={16} color={Colors.onSecondary} />
+                <Text style={styles.primaryCtaText}>Explore Plants</Text>
+                <View
+                  style={[
+                    styles.primaryCtaArrowBox,
+                    hoveredCta === 'primary' && styles.primaryCtaArrowBoxHovered,
+                  ]}
+                >
+                  <Ionicons name="arrow-forward" size={15} color={Colors.onPrimary} />
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.glassButton}
-                activeOpacity={0.85}
-                onPress={openZonePicker}
+                style={[
+                  styles.secondaryCta,
+                  hoveredCta === 'secondary' && styles.secondaryCtaHovered,
+                ]}
+                onPress={onFindPlant}
+                activeOpacity={0.82}
+                accessibilityRole="button"
+                accessibilityLabel="Find My Plant"
+                {...(Platform.OS === 'web'
+                  ? ({
+                      onMouseEnter: () => setHoveredCta('secondary'),
+                      onMouseLeave: () => setHoveredCta(null),
+                    } as any)
+                  : {})}
               >
-                <Ionicons name="location" size={16} color={Colors.surface} />
-                <Text style={styles.glassButtonText}>Find My Zone Matches</Text>
+                <Text style={styles.secondaryCtaText}>Find My Plant</Text>
               </TouchableOpacity>
+            </Animated.View>
+          </View>
+
+          {/* RIGHT VISUAL COMPOSITION */}
+          <View
+            style={[
+              styles.visualColumn,
+              isWide && styles.visualColumnDesktop,
+              isTablet && styles.visualColumnTablet,
+            ]}
+          >
+            <View
+              style={[
+                styles.visualStage,
+                isWide && styles.visualStageDesktop,
+                isTablet && styles.visualStageTablet,
+              ]}
+            >
+              {/* Luminous gentle sunlit foliage backlight halo */}
+              <View style={styles.foliageBacklight} pointerEvents="none" />
+
+              {/* Dominant Hero Plant Image with gentle botanical breathe */}
+              <TouchableOpacity
+                style={[
+                  styles.mainImageWrapper,
+                  isWide && styles.mainImageWrapperDesktop,
+                  isTablet && styles.mainImageWrapperTablet,
+                  isImageHovered && styles.mainImageHovered,
+                  Platform.OS === 'web' && isWide && ({ className: 'botanical-breathe' } as any),
+                ]}
+                onPress={() => onSelectFeatured(primaryPlant.id)}
+                activeOpacity={0.96}
+                accessibilityRole="button"
+                accessibilityLabel={`Featured plant: ${primaryPlant.name} in modern sunlit living space`}
+                {...(Platform.OS === 'web'
+                  ? ({
+                      onMouseEnter: () => setIsImageHovered(true),
+                      onMouseLeave: () => setIsImageHovered(false),
+                    } as any)
+                  : {})}
+              >
+                <Image
+                  source={{ uri: primaryPlant.imageUrl }}
+                  style={[
+                    styles.mainImage,
+                    isWide && styles.mainImageDesktop,
+                    isTablet && styles.mainImageTablet,
+                  ]}
+                  accessibilityLabel={`${primaryPlant.name} tree in a warm, sunlit modern apartment with natural wood and ceramic planter`}
+                />
+              </TouchableOpacity>
+
+              {/* Smaller Supporting Botanical Image (Desktop/Tablet) */}
+              {isWide && (
+                <TouchableOpacity
+                  style={[
+                    styles.supportingImageWrapper,
+                    isTablet && styles.supportingImageWrapperTablet,
+                  ]}
+                  onPress={() => onSelectFeatured(secondaryPlant.id)}
+                  activeOpacity={0.95}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Botanical detail: ${secondaryPlant.name}`}
+                >
+                  <Image
+                    source={{ uri: secondaryPlant.imageUrl }}
+                    style={[
+                      styles.supportingImage,
+                      isTablet && styles.supportingImageTablet,
+                    ]}
+                    accessibilityLabel={`${secondaryPlant.name} foliage in a handcrafted ceramic planter with warm ambient light`}
+                  />
+                </TouchableOpacity>
+              )}
+
+              {/* THREE REFINED FLOATING INFORMATION CARDS (Desktop/Tablet) */}
+              {isWide && (
+                <>
+                  {/* Card 1: Easy Care */}
+                  <View
+                    style={[
+                      styles.infoCard,
+                      styles.cardTopLeft,
+                      isTablet && styles.cardTopLeftTablet,
+                      hoveredCardIndex === 0 && styles.infoCardHovered,
+                      Platform.OS === 'web' && ({ className: 'card-float-a' } as any),
+                    ]}
+                    {...(Platform.OS === 'web'
+                      ? ({
+                          onMouseEnter: () => setHoveredCardIndex(0),
+                          onMouseLeave: () => setHoveredCardIndex(null),
+                        } as any)
+                      : {})}
+                  >
+                    <View style={styles.cardIconBox}>
+                      <Ionicons name="cloud-outline" size={14} color={Colors.secondary} />
+                    </View>
+                    <View style={styles.cardTextBox}>
+                      <Text style={styles.cardTitle}>Easy Care</Text>
+                      <Text style={styles.cardSub}>Perfect for beginners</Text>
+                    </View>
+                  </View>
+
+                  {/* Card 2: Bright Indirect */}
+                  <View
+                    style={[
+                      styles.infoCard,
+                      styles.cardTopRight,
+                      isTablet && styles.cardTopRightTablet,
+                      hoveredCardIndex === 1 && styles.infoCardHovered,
+                      Platform.OS === 'web' && ({ className: 'card-float-b' } as any),
+                    ]}
+                    {...(Platform.OS === 'web'
+                      ? ({
+                          onMouseEnter: () => setHoveredCardIndex(1),
+                          onMouseLeave: () => setHoveredCardIndex(null),
+                        } as any)
+                      : {})}
+                  >
+                    <View style={styles.cardIconBox}>
+                      <Ionicons name="sunny-outline" size={14} color={Colors.secondary} />
+                    </View>
+                    <View style={styles.cardTextBox}>
+                      <Text style={styles.cardTitle}>Bright Indirect</Text>
+                      <Text style={styles.cardSub}>Ideal indoor light</Text>
+                    </View>
+                  </View>
+
+                  {/* Card 3: Balanced Humidity */}
+                  <View
+                    style={[
+                      styles.infoCard,
+                      styles.cardBottomRight,
+                      isTablet && styles.cardBottomRightTablet,
+                      hoveredCardIndex === 2 && styles.infoCardHovered,
+                      Platform.OS === 'web' && ({ className: 'card-float-a' } as any),
+                    ]}
+                    {...(Platform.OS === 'web'
+                      ? ({
+                          onMouseEnter: () => setHoveredCardIndex(2),
+                          onMouseLeave: () => setHoveredCardIndex(null),
+                        } as any)
+                      : {})}
+                  >
+                    <View style={styles.cardIconBox}>
+                      <Ionicons name="water-outline" size={14} color={Colors.secondary} />
+                    </View>
+                    <View style={styles.cardTextBox}>
+                      <Text style={styles.cardTitle}>Balanced Humidity</Text>
+                      <Text style={styles.cardSub}>Simple weekly care</Text>
+                    </View>
+                  </View>
+                </>
+              )}
+            </View>
+          </View>
+        </View>
+
+        {/* MOBILE CARE CARDS (Clean vertical stack below plant photo) */}
+        {!isWide && (
+          <View style={styles.mobileCardsWrapper}>
+            <View style={styles.mobileCard}>
+              <View style={styles.cardIconBox}>
+                <Ionicons name="cloud-outline" size={14} color={Colors.secondary} />
+              </View>
+              <View style={styles.cardTextBox}>
+                <Text style={styles.cardTitle}>Easy Care</Text>
+                <Text style={styles.cardSub}>Perfect for beginners</Text>
+              </View>
             </View>
 
-            {/* Trust Metrics */}
-            <View style={styles.trustRow}>
-              <View style={styles.trustItem}>
-                <Ionicons name="shield-checkmark" size={16} color={Colors.secondaryContainer} />
-                <Text style={styles.trustText}>30-Day Guarantee</Text>
+            <View style={styles.mobileCard}>
+              <View style={styles.cardIconBox}>
+                <Ionicons name="sunny-outline" size={14} color={Colors.secondary} />
               </View>
-              <View style={styles.trustDivider} />
-              <View style={styles.trustItem}>
-                <Ionicons name="leaf" size={16} color={Colors.secondaryContainer} />
-                <Text style={styles.trustText}>Carbon-Neutral Shipping</Text>
+              <View style={styles.cardTextBox}>
+                <Text style={styles.cardTitle}>Bright Indirect</Text>
+                <Text style={styles.cardSub}>Ideal indoor light</Text>
+              </View>
+            </View>
+
+            <View style={styles.mobileCard}>
+              <View style={styles.cardIconBox}>
+                <Ionicons name="water-outline" size={14} color={Colors.secondary} />
+              </View>
+              <View style={styles.cardTextBox}>
+                <Text style={styles.cardTitle}>Balanced Humidity</Text>
+                <Text style={styles.cardSub}>Simple weekly care</Text>
               </View>
             </View>
           </View>
+        )}
 
-          {/* Right Column: Curator's Choice Floating Showcase (Desktop) */}
-          {isDesktop && (
-            <TouchableOpacity
-              style={styles.showcaseCard}
-              activeOpacity={0.9}
-              onPress={() => onSelectFeatured('monstera-deliciosa')}
+        {/* HERO BOTTOM: Subtle editorial discovery transition into Plant Finder */}
+        <TouchableOpacity
+          style={[
+            styles.transitionStrip,
+            isBottomHovered && styles.transitionStripHovered,
+          ]}
+          onPress={onFindPlant}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Find your perfect plant - personalized recommendations based on light, space and lifestyle"
+          {...(Platform.OS === 'web'
+            ? ({
+                onMouseEnter: () => setIsBottomHovered(true),
+                onMouseLeave: () => setIsBottomHovered(false),
+              } as any)
+            : {})}
+        >
+          <View style={styles.transitionDividerLine} />
+          <View style={styles.transitionInner}>
+            <Text style={styles.transitionEyebrow}>FIND YOUR PERFECT PLANT</Text>
+            <Text style={styles.transitionSubtitle}>
+              Personalized recommendations based on your light, space and lifestyle.
+            </Text>
+            <View
+              style={[
+                styles.transitionArrowWrapper,
+                isBottomHovered && styles.transitionArrowWrapperHovered,
+              ]}
             >
-              <Image
-                source={{
-                  uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCwy384c8_0J29L2xVqsXySEs4IJy-QmVdz36nZnuBt1j5SC8wpB39RE9vhDJUA9Jr_Xc9gXCipBAsrG9QxXhzdRqRo8Lfjj0ffCyJ1GaolyO7t3JqKkcjO7iUPnyY0oQakqE9muixtvi7DFDHFKBWt7oF1T3UBU0tGRTST8bAiu2p5b81Pdl91tyZh2cnrHmJxEXxHWBsyKW74vvCDMr1TOMDyBKu7gAKyuSaysC_MVk3illqqb8wPiw',
-                }}
-                style={styles.showcaseImage}
-              />
-              <View style={styles.showcaseFooter}>
-                <View>
-                  <Text style={styles.showcaseTag}>Curator's Choice</Text>
-                  <Text style={styles.showcaseTitle}>Monstera Deliciosa</Text>
-                  <Text style={styles.showcaseNote}>Selected for coastal airflow</Text>
-                </View>
-                <Text style={styles.showcasePrice}>$42</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
+              <Ionicons name="arrow-down" size={13} color={Colors.secondary} />
+            </View>
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  heroWrapper: {
+  stage: {
     paddingHorizontal: Spacing.marginMobile,
-    paddingTop: Spacing.sm,
-    paddingBottom: Spacing.md,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.xs,
   },
-  heroCard: {
-    backgroundColor: Colors.primaryContainer,
+  card: {
+    backgroundColor: '#FAF8F4',
     borderRadius: Radii.xl,
     overflow: 'hidden',
     position: 'relative',
-    ...Shadows.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(1, 45, 29, 0.04)',
+    ...Shadows.sm,
   },
-  desktopHeroCard: {
+  cardDesktop: {
     maxWidth: 1280,
     alignSelf: 'center',
     width: '100%',
+    borderRadius: 30,
+    minHeight: 650,
+    justifyContent: 'space-between',
   },
-  backgroundImage: {
+  cardTablet: {
+    minHeight: 560,
+    borderRadius: 24,
+  },
+  ambientAuraTop: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-    opacity: 0.22,
-    resizeMode: 'cover',
+    top: -60,
+    left: -40,
+    width: 380,
+    height: 320,
+    borderRadius: 190,
+    backgroundColor: 'rgba(216, 243, 220, 0.22)',
+    ...(Platform.OS === 'web' ? ({ filter: 'blur(50px)' } as any) : {}),
   },
-  scrimOverlay: {
+  ambientAuraRight: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(1, 45, 29, 0.65)',
+    right: -80,
+    top: 40,
+    width: 500,
+    height: 500,
+    borderRadius: 250,
+    backgroundColor: 'rgba(160, 244, 200, 0.16)',
+    ...(Platform.OS === 'web' ? ({ filter: 'blur(70px)' } as any) : {}),
   },
-  contentLayout: {
-    padding: Spacing.lg,
-    zIndex: 10,
+  heroBody: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
+    gap: 20,
+    zIndex: 2,
   },
-  desktopLayout: {
+  heroBodyDesktop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.xl * 1.5,
-    gap: 40,
+    paddingHorizontal: 48,
+    paddingTop: 32,
+    paddingBottom: 16,
+    flex: 1,
+    gap: 20,
   },
-  textColumn: {
+  heroBodyTablet: {
+    paddingHorizontal: 28,
+    paddingTop: 24,
     gap: 16,
   },
-  desktopTextColumn: {
-    flex: 1,
-    maxWidth: 620,
+  copyColumn: {
+    gap: 14,
   },
-  releasePill: {
+  copyColumnDesktop: {
+    flex: 1,
+    maxWidth: 490,
+    paddingRight: 12,
+  },
+  copyColumnTablet: {
+    maxWidth: 370,
+    paddingRight: 4,
+  },
+  eyebrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(251, 249, 245, 0.12)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: Radii.full,
     gap: 6,
   },
-  releasePillText: {
-    color: Colors.secondaryContainer,
+  eyebrowText: {
+    fontFamily: Platform.OS === 'web' ? '"Plus Jakarta Sans", sans-serif' : 'System',
     fontSize: 11,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    color: Colors.secondary,
+    letterSpacing: 2,
     textTransform: 'uppercase',
   },
-  heroHeadline: {
-    fontFamily: Platform.OS === 'web' ? 'Playfair Display, serif' : 'System',
-    fontSize: 26,
-    lineHeight: 34,
+  heading: {
+    fontFamily: Platform.OS === 'web' ? 'Playfair Display, Georgia, serif' : 'System',
+    fontSize: 32,
+    lineHeight: 40,
     fontWeight: '700',
-    color: Colors.surface,
-    letterSpacing: -0.5,
+    color: Colors.onSurface,
+    letterSpacing: -0.8,
   },
-  desktopHeadline: {
-    fontSize: 44,
-    lineHeight: 52,
+  headingDesktop: {
+    fontSize: 52,
+    lineHeight: 60,
+    letterSpacing: -1.2,
   },
-  heroSubtext: {
+  headingTablet: {
+    fontSize: 38,
+    lineHeight: 46,
+    letterSpacing: -0.8,
+  },
+  headingAccent: {
+    color: '#0e6c4a',
+  },
+  supportingText: {
+    fontFamily: Platform.OS === 'web' ? '"Plus Jakarta Sans", sans-serif' : 'System',
     fontSize: 14,
     lineHeight: 22,
-    color: Colors.inversePrimary,
+    color: Colors.onSurfaceVariant,
+    maxWidth: 420,
+  },
+  supportingTextDesktop: {
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  supportingTextTablet: {
+    fontSize: 13.5,
+    lineHeight: 21,
   },
   ctaRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    paddingTop: 8,
+    alignItems: 'center',
+    gap: 14,
+    paddingTop: 4,
   },
-  primaryButton: {
-    backgroundColor: Colors.secondary,
+  primaryCta: {
+    backgroundColor: Colors.primary,
+    paddingLeft: 26,
+    paddingRight: 20,
+    paddingVertical: 13.5,
+    borderRadius: Radii.full,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: Radii.md,
-    gap: 8,
+    justifyContent: 'center',
+    gap: 6,
     ...Shadows.sm,
+    cursor: Platform.OS === 'web' ? ('pointer' as any) : undefined,
+    transition: Platform.OS === 'web' ? ('transform 0.2s ease, background-color 0.2s ease' as any) : undefined,
   },
-  primaryButtonText: {
-    color: Colors.onSecondary,
+  primaryCtaHovered: {
+    backgroundColor: Colors.primaryContainer,
+    transform: [{ scale: 1.015 }],
+  },
+  primaryCtaText: {
+    color: Colors.onPrimary,
     fontSize: 14,
     fontWeight: '700',
+    letterSpacing: 0.2,
   },
-  glassButton: {
-    backgroundColor: 'rgba(251, 249, 245, 0.14)',
-    flexDirection: 'row',
+  primaryCtaArrowBox: {
+    transition: Platform.OS === 'web' ? ('transform 0.2s ease' as any) : undefined,
+  },
+  primaryCtaArrowBoxHovered: {
+    transform: [{ translateX: 3 }],
+  },
+  secondaryCta: {
+    backgroundColor: 'rgba(1, 45, 29, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(1, 45, 29, 0.15)',
+    paddingHorizontal: 22,
+    paddingVertical: 12.5,
+    borderRadius: Radii.full,
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: Radii.md,
-    gap: 8,
+    justifyContent: 'center',
+    cursor: Platform.OS === 'web' ? ('pointer' as any) : undefined,
+    transition: Platform.OS === 'web' ? ('background-color 0.2s ease, border-color 0.2s ease' as any) : undefined,
   },
-  glassButtonText: {
-    color: Colors.surface,
+  secondaryCtaHovered: {
+    backgroundColor: 'rgba(1, 45, 29, 0.07)',
+    borderColor: 'rgba(1, 45, 29, 0.3)',
+  },
+  secondaryCtaText: {
+    color: Colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },
-  trustRow: {
-    flexDirection: 'row',
+  visualColumn: {
+    width: '100%',
     alignItems: 'center',
-    gap: 16,
-    paddingTop: 8,
+    zIndex: 3,
   },
-  trustItem: {
-    flexDirection: 'row',
+  visualColumnDesktop: {
+    flex: 1,
+    maxWidth: 560,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  visualColumnTablet: {
+    maxWidth: 380,
+  },
+  visualStage: {
+    width: '100%',
     alignItems: 'center',
-    gap: 6,
+    position: 'relative',
   },
-  trustDivider: {
-    width: 1,
-    height: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  visualStageDesktop: {
+    width: 520,
+    height: 470,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
-  trustText: {
-    color: Colors.inversePrimary,
-    fontSize: 12,
-    fontWeight: '500',
+  visualStageTablet: {
+    width: 370,
+    height: 380,
   },
-  showcaseCard: {
+  foliageBacklight: {
+    position: 'absolute',
+    top: 20,
+    right: 30,
     width: 320,
-    borderRadius: Radii.lg,
-    overflow: 'hidden',
+    height: 380,
+    borderRadius: 160,
+    backgroundColor: 'rgba(160, 244, 200, 0.24)',
+    ...(Platform.OS === 'web' ? ({ filter: 'blur(45px)' } as any) : {}),
+  },
+  mainImageWrapper: {
+    borderRadius: 32,
+    ...Shadows.md,
     backgroundColor: Colors.surfaceContainerLow,
+    cursor: Platform.OS === 'web' ? ('pointer' as any) : undefined,
+    transition: Platform.OS === 'web' ? ('transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)' as any) : undefined,
+  },
+  mainImageWrapperDesktop: {
+    width: 350,
+    height: 440,
+  },
+  mainImageWrapperTablet: {
+    width: 260,
+    height: 340,
+  },
+  mainImageHovered: {
+    transform: [{ scale: 1.015 }],
+  },
+  mainImage: {
+    width: 290,
+    height: 320,
+    resizeMode: 'cover',
+    borderTopLeftRadius: 140,
+    borderTopRightRadius: 140,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    backgroundColor: Colors.surfaceContainerLow,
+  },
+  mainImageDesktop: {
+    width: 350,
+    height: 440,
+    borderTopLeftRadius: 175,
+    borderTopRightRadius: 175,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  mainImageTablet: {
+    width: 260,
+    height: 340,
+    borderTopLeftRadius: 130,
+    borderTopRightRadius: 130,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
+  supportingImageWrapper: {
+    position: 'absolute',
+    bottom: 8,
+    left: 12,
+    zIndex: 3,
+    borderRadius: 24,
+    borderWidth: 3,
+    borderColor: '#FAF8F4',
+    ...Shadows.lg,
+    backgroundColor: Colors.surfaceContainerLow,
+    cursor: Platform.OS === 'web' ? ('pointer' as any) : undefined,
+  },
+  supportingImageWrapperTablet: {
+    bottom: 4,
+    left: 8,
+    borderRadius: 18,
+    borderWidth: 2,
+  },
+  supportingImage: {
+    width: 170,
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 21,
+    backgroundColor: Colors.surfaceContainerLow,
+  },
+  supportingImageTablet: {
+    width: 120,
+    height: 145,
+    borderRadius: 16,
+  },
+  infoCard: {
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: 'rgba(1, 45, 29, 0.08)',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    ...Shadows.sm,
+    zIndex: 4,
+    cursor: Platform.OS === 'web' ? ('default' as any) : undefined,
+    transition: Platform.OS === 'web' ? ('transform 0.25s ease, box-shadow 0.25s ease' as any) : undefined,
+  },
+  infoCardHovered: {
+    transform: [{ translateY: -2.5 }],
     ...Shadows.md,
   },
-  showcaseImage: {
-    width: '100%',
-    height: 280,
-    resizeMode: 'cover',
+  cardTopLeft: {
+    top: 28,
+    left: -10,
   },
-  showcaseFooter: {
-    position: 'absolute',
-    bottom: 12,
-    left: 12,
-    right: 12,
-    backgroundColor: 'rgba(1, 45, 29, 0.88)',
-    padding: 12,
-    borderRadius: Radii.md,
+  cardTopLeftTablet: {
+    top: 10,
+    left: 4,
+  },
+  cardTopRight: {
+    top: 50,
+    right: 6,
+  },
+  cardTopRightTablet: {
+    top: 30,
+    right: 2,
+  },
+  cardBottomRight: {
+    bottom: 36,
+    right: 14,
+  },
+  cardBottomRightTablet: {
+    bottom: 20,
+    right: 6,
+  },
+  cardIconBox: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(14, 108, 74, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardTextBox: {
+    gap: 1,
+  },
+  cardTitle: {
+    fontFamily: Platform.OS === 'web' ? '"Plus Jakarta Sans", sans-serif' : 'System',
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: Colors.onSurface,
+  },
+  cardSub: {
+    fontFamily: Platform.OS === 'web' ? '"Plus Jakarta Sans", sans-serif' : 'System',
+    fontSize: 10,
+    color: Colors.outline,
+  },
+  mobileCardsWrapper: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
+    gap: 8,
+    zIndex: 2,
+  },
+  mobileCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: 'rgba(1, 45, 29, 0.08)',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    ...Shadows.sm,
   },
-  showcaseTag: {
-    color: Colors.secondaryContainer,
-    fontSize: 10,
+  transitionStrip: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(1, 45, 29, 0.09)',
+    paddingVertical: 14,
+    paddingHorizontal: Spacing.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    alignItems: 'center',
+    cursor: Platform.OS === 'web' ? ('pointer' as any) : undefined,
+    zIndex: 2,
+  },
+  transitionStripHovered: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  },
+  transitionDividerLine: {
+    width: 44,
+    height: 2,
+    backgroundColor: 'rgba(14, 108, 74, 0.25)',
+    borderRadius: 1,
+    marginBottom: 8,
+  },
+  transitionInner: {
+    alignItems: 'center',
+    gap: 3,
+  },
+  transitionEyebrow: {
+    fontFamily: Platform.OS === 'web' ? '"Plus Jakarta Sans", sans-serif' : 'System',
+    fontSize: 10.5,
     fontWeight: '700',
+    letterSpacing: 2,
+    color: Colors.secondary,
     textTransform: 'uppercase',
   },
-  showcaseTitle: {
-    fontFamily: Platform.OS === 'web' ? 'Playfair Display, serif' : 'System',
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.surface,
+  transitionSubtitle: {
+    fontFamily: Platform.OS === 'web' ? '"Plus Jakarta Sans", sans-serif' : 'System',
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
   },
-  showcaseNote: {
-    fontSize: 11,
-    color: Colors.surfaceContainerHigh,
+  transitionArrowWrapper: {
+    marginTop: 3,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(14, 108, 74, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: Platform.OS === 'web' ? ('transform 0.2s ease' as any) : undefined,
   },
-  showcasePrice: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.secondaryContainer,
+  transitionArrowWrapperHovered: {
+    transform: [{ translateY: 2 }],
   },
 });

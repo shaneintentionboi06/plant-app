@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { PlantSpecimen } from '../data/plants';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
+import { formatINR } from '../utils/currency';
 import { useWishlistStore } from '../store/useWishlistStore';
 import { useCartStore } from '../store/useCartStore';
 import { useZoneStore } from '../store/useZoneStore';
@@ -17,12 +18,15 @@ import { useZoneStore } from '../store/useZoneStore';
 interface PlantCardProps {
   plant: PlantSpecimen;
   onPress: (plant: PlantSpecimen) => void;
+  large?: boolean;
 }
 
-export const PlantCard: React.FC<PlantCardProps> = ({ plant, onPress }) => {
+export const PlantCard: React.FC<PlantCardProps> = ({ plant, onPress, large }) => {
   const { isWishlisted, toggleWishlist } = useWishlistStore();
   const addItem = useCartStore((s) => s.addItem);
   const currentZone = useZoneStore((s) => s.currentZone);
+  const [hovered, setHovered] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const favorited = isWishlisted(plant.id);
   const matchPercent = plant.zoneMatchPercent[currentZone] || 90;
@@ -30,17 +34,36 @@ export const PlantCard: React.FC<PlantCardProps> = ({ plant, onPress }) => {
   const handleQuickAdd = (e: any) => {
     e.stopPropagation?.();
     addItem(plant, plant.sizes[0]?.id || 'sm', plant.vessels[0]?.id || 'sage', true, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1200);
   };
 
+  const hoverProps =
+    Platform.OS === 'web'
+      ? {
+          onMouseEnter: () => setHovered(true),
+          onMouseLeave: () => setHovered(false),
+        }
+      : {};
+
   return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.92}
-      onPress={() => onPress(plant)}
+    <View
+      style={[styles.card, hovered && styles.cardHovered]}
+      {...(hoverProps as object)}
     >
-      {/* Image Container */}
-      <View style={styles.imageWrap}>
-        <Image source={{ uri: plant.imageUrl }} style={styles.image} />
+      {/* Image Container — opens product details */}
+      <TouchableOpacity
+        style={[styles.imageWrap, large && styles.imageWrapLarge]}
+        activeOpacity={0.94}
+        onPress={() => onPress(plant)}
+        accessibilityRole="button"
+        accessibilityLabel={`${plant.name}, ${plant.botanicalName}, ${formatINR(plant.price)}`}
+      >
+        <Image
+          source={{ uri: plant.imageUrl }}
+          style={[styles.image, hovered && styles.imageHovered]}
+          accessibilityLabel={`${plant.name} photo`}
+        />
 
         {/* Top Badges */}
         <View style={styles.badgeRow}>
@@ -63,20 +86,6 @@ export const PlantCard: React.FC<PlantCardProps> = ({ plant, onPress }) => {
           )}
         </View>
 
-        {/* Wishlist Heart Button */}
-        <TouchableOpacity
-          style={styles.wishlistButton}
-          activeOpacity={0.8}
-          onPress={() => toggleWishlist(plant.id)}
-          accessibilityLabel="Save to Wishlist"
-        >
-          <Ionicons
-            name={favorited ? 'heart' : 'heart-outline'}
-            size={18}
-            color={favorited ? '#e11d48' : Colors.primary}
-          />
-        </TouchableOpacity>
-
         {/* Bottom Climate Tag Overlay */}
         {plant.climateTag && (
           <View style={styles.climateTagPill}>
@@ -85,66 +94,126 @@ export const PlantCard: React.FC<PlantCardProps> = ({ plant, onPress }) => {
             </Text>
           </View>
         )}
-      </View>
+      </TouchableOpacity>
+
+      {/* Wishlist Heart Button (sibling overlay — avoids nested buttons) */}
+      <TouchableOpacity
+        style={styles.wishlistButton}
+        activeOpacity={0.8}
+        onPress={() => toggleWishlist(plant.id)}
+        accessibilityRole="button"
+        accessibilityLabel={favorited ? `Remove ${plant.name} from wishlist` : `Save ${plant.name} to wishlist`}
+        accessibilityState={{ selected: favorited }}
+      >
+        <Ionicons
+          name={favorited ? 'heart' : 'heart-outline'}
+          size={18}
+          color={favorited ? '#e11d48' : Colors.primary}
+        />
+      </TouchableOpacity>
 
       {/* Info Container */}
       <View style={styles.infoContainer}>
-        <View style={styles.titleRow}>
+        <TouchableOpacity
+          style={styles.titleRow}
+          activeOpacity={0.9}
+          onPress={() => onPress(plant)}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${plant.name} details`}
+        >
           <Text style={styles.plantTitle} numberOfLines={1}>
             {plant.name}
           </Text>
-          <Text style={styles.commonName} numberOfLines={1}>
-            {plant.commonName}
+          <Text style={styles.scientificName} numberOfLines={1}>
+            {plant.botanicalName}
           </Text>
+        </TouchableOpacity>
+
+        {/* Care metadata */}
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
+            <Ionicons name="sunny-outline" size={12} color={Colors.secondary} />
+            <Text style={styles.metaText} numberOfLines={1}>
+              {plant.lowLight ? 'Low Light' : 'Medium Light'}
+            </Text>
+          </View>
+          <Text style={styles.metaDot}>·</Text>
+          <Text style={styles.metaText} numberOfLines={1}>
+            {plant.care.difficulty}
+          </Text>
+          {plant.petSafe ? (
+            <>
+              <Text style={styles.metaDot}>·</Text>
+              <View style={styles.metaItem}>
+                <Ionicons name="paw" size={12} color={Colors.secondary} />
+                <Text style={styles.metaText}>Pet Safe</Text>
+              </View>
+            </>
+          ) : null}
         </View>
 
         {/* Price & Quick Add Button */}
         <View style={styles.priceRow}>
           <View style={styles.priceBlock}>
-            <Text style={styles.priceText}>${plant.price.toFixed(2)}</Text>
+            <Text style={styles.priceText}>{formatINR(plant.price)}</Text>
             {plant.originalPrice && (
               <Text style={styles.originalPriceText}>
-                ${plant.originalPrice.toFixed(2)}
+                {formatINR(plant.originalPrice)}
               </Text>
             )}
           </View>
 
           <TouchableOpacity
-            style={styles.quickAddButton}
+            style={[styles.quickAddButton, added && styles.quickAddButtonAdded]}
             activeOpacity={0.8}
             onPress={handleQuickAdd}
-            accessibilityLabel={`Add ${plant.name} to bag`}
+            accessibilityRole="button"
+            accessibilityLabel={added ? `${plant.name} added to bag` : `Add ${plant.name} to bag`}
           >
-            <Ionicons name="add" size={18} color={Colors.onPrimary} />
+            <Ionicons
+              name={added ? 'checkmark' : 'add'}
+              size={18}
+              color={Colors.onPrimary}
+            />
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: Radii.lg,
+    borderRadius: Radii.xl,
     overflow: 'hidden',
     ...Shadows.sm,
     borderWidth: 1,
-    borderColor: Colors.surfaceContainerLow,
+    borderColor: Colors.surfaceContainer,
     flex: 1,
     margin: 6,
   },
+  cardHovered: {
+    borderColor: Colors.outlineVariant,
+    ...Shadows.md,
+  },
   imageWrap: {
     width: '100%',
-    aspectRatio: 1,
+    aspectRatio: 0.92,
     backgroundColor: Colors.surfaceContainerLow,
     position: 'relative',
     overflow: 'hidden',
+  },
+  imageWrapLarge: {
+    aspectRatio: 1.05,
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  imageHovered: {
+    transform: [{ scale: 1.05 }],
   },
   badgeRow: {
     position: 'absolute',
@@ -240,6 +309,31 @@ const styles = StyleSheet.create({
     color: Colors.onSurfaceVariant,
     fontStyle: 'italic',
   },
+  scientificName: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: Colors.onSurfaceVariant,
+    fontStyle: 'italic',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  metaText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.onSurfaceVariant,
+  },
+  metaDot: {
+    fontSize: 11,
+    color: Colors.outline,
+  },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -269,5 +363,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     ...Shadows.sm,
+  },
+  quickAddButtonAdded: {
+    backgroundColor: Colors.secondary,
   },
 });
