@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, SafeAreaView, Platform } from 'react-native';
-import { Header } from '@/components/Header';
+import { Header, HomeSection } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { HomeScreen } from '@/screens/HomeScreen';
+import { HomeScreen, SectionRequest } from '@/screens/HomeScreen';
+import { ArticleScreen } from '@/screens/ArticleScreen';
 import { ProductDetailsScreen } from '@/screens/ProductDetailsScreen';
 import { CartScreen } from '@/screens/CartScreen';
 import { AccountScreen } from '@/screens/AccountScreen';
@@ -10,17 +11,28 @@ import { LocationZoneModal } from '@/screens/LocationZoneModal';
 import { ChatScreen } from '@/screens/ChatScreen';
 import { ChatFab } from '@/components/ChatFab';
 import { PlantSpecimen, PLANTS_DATA } from '@/data/plants';
+import { PlantSpecimen } from '@/data/plants';
 import { Colors } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useZoneStore } from '@/store/useZoneStore';
+import { usePlantsStore } from '@/store/usePlantsStore';
 
 export default function BotanicalApp() {
   const { isDesktop } = useResponsive();
   const openZonePicker = useZoneStore((s) => s.openZonePicker);
+  const plants = usePlantsStore((s) => s.plants);
+  const fetchPlants = usePlantsStore((s) => s.fetchPlants);
 
-  const [currentTab, setCurrentTab] = useState<'catalog' | 'cart' | 'account' | 'details'>('catalog');
+  useEffect(() => {
+    fetchPlants();
+  }, [fetchPlants]);
+
+  const [currentTab, setCurrentTab] = useState<'catalog' | 'cart' | 'account' | 'details' | 'article'>('catalog');
   const [selectedPlant, setSelectedPlant] = useState<PlantSpecimen | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<string>('monstera-care');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sectionRequest, setSectionRequest] = useState<SectionRequest | null>(null);
+  const [wishlistOnly, setWishlistOnly] = useState(false);
 
   const handleSelectPlant = (plant: PlantSpecimen) => {
     setSelectedPlant(plant);
@@ -28,11 +40,28 @@ export default function BotanicalApp() {
   };
 
   const handleSelectPlantById = (id: string) => {
-    const found = PLANTS_DATA.find((p) => p.id === id);
+    const found = plants.find((p) => p.id === id);
     if (found) {
       setSelectedPlant(found);
       setCurrentTab('details');
     }
+  };
+
+  const handleOpenArticle = (slug: string) => {
+    setSelectedArticle(slug);
+    setCurrentTab('article');
+  };
+
+  const handleNavigate = (section: HomeSection) => {
+    if (currentTab !== 'catalog') setCurrentTab('catalog');
+    setSectionRequest({ section, nonce: Date.now() });
+  };
+
+  const handleToggleWishlist = () => {
+    const next = !wishlistOnly;
+    setWishlistOnly(next);
+    if (currentTab !== 'catalog') setCurrentTab('catalog');
+    setSectionRequest({ section: 'shop', nonce: Date.now() });
   };
 
   return (
@@ -46,11 +75,14 @@ export default function BotanicalApp() {
               setCurrentTab(tab);
             }
           }}
+          onNavigate={handleNavigate}
           searchQuery={searchQuery}
           onSearchChange={(q) => {
             setSearchQuery(q);
             if (currentTab !== 'catalog') setCurrentTab('catalog');
           }}
+          wishlistActive={wishlistOnly}
+          onToggleWishlist={handleToggleWishlist}
         />
 
         {/* Dynamic Screen Switcher */}
@@ -68,10 +100,25 @@ export default function BotanicalApp() {
             />
           ) : currentTab === 'account' ? (
             <AccountScreen />
+          ) : currentTab === 'article' ? (
+            <ArticleScreen
+              slug={selectedArticle}
+              onBack={() => setCurrentTab('catalog')}
+              onOpenArticle={handleOpenArticle}
+              onSelectPlant={handleSelectPlant}
+              onGoToCart={() => setCurrentTab('cart')}
+            />
           ) : (
             <HomeScreen
               onSelectPlant={handleSelectPlant}
               searchQuery={searchQuery}
+              sectionRequest={sectionRequest}
+              wishlistOnly={wishlistOnly}
+              onClearWishlist={() => setWishlistOnly(false)}
+              onOpenGreenhouse={() => setCurrentTab('account')}
+              onOpenCart={() => setCurrentTab('cart')}
+              onNavigate={handleNavigate}
+              onOpenArticle={handleOpenArticle}
             />
           )}
         </View>

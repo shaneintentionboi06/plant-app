@@ -1,40 +1,144 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HeroBanner } from '../components/HeroBanner';
 import { FilterChips } from '../components/FilterChips';
 import { PlantCard } from '../components/PlantCard';
-import { PLANTS_DATA, PlantSpecimen } from '../data/plants';
+import {
+  PlantFinder,
+  FinderPreferences,
+  EMPTY_FINDER,
+} from '../components/PlantFinder';
+import {
+  SectionHeading,
+  ShopByNeed,
+  FeaturedPlants,
+  PlantJournal,
+  GreenhousePreview,
+  Newsletter,
+  Footer,
+} from '../components/HomeSections';
+import type { HomeSection } from '../components/Header';
+import { PlantSpecimen } from '../data/plants';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
 import { useResponsive } from '../hooks/useResponsive';
 import { useZoneStore } from '../store/useZoneStore';
-import { useCartStore } from '../store/useCartStore';
+import { useWishlistStore } from '../store/useWishlistStore';
+import { usePlantsStore } from '../store/usePlantsStore';
+
+export interface SectionRequest {
+  section: HomeSection;
+  nonce: number;
+}
 
 interface HomeScreenProps {
   onSelectPlant: (plant: PlantSpecimen) => void;
   searchQuery?: string;
+  sectionRequest?: SectionRequest | null;
+  wishlistOnly?: boolean;
+  onClearWishlist?: () => void;
+  onOpenGreenhouse?: () => void;
+  onOpenCart?: () => void;
+  onNavigate?: (section: HomeSection) => void;
+  onOpenArticle?: (slug: string) => void;
+}
+
+function matchesFinder(p: PlantSpecimen, prefs: FinderPreferences): boolean {
+  if (prefs.light === 'low' && !p.lowLight) return false;
+  if (prefs.light === 'bright' && p.lowLight) return false;
+  if (prefs.petFriendly && !p.petSafe) return false;
+  if (prefs.easyCare && !p.easyCare) return false;
+  if (prefs.airPurifying && !p.airPurifying) return false;
+  if (prefs.largePlants && !p.tree) return false;
+  return true;
+}
+
+function hasPrefs(prefs: FinderPreferences): boolean {
+  return (
+    prefs.light !== 'any' ||
+    prefs.petFriendly ||
+    prefs.easyCare ||
+    prefs.airPurifying ||
+    prefs.largePlants
+  );
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onSelectPlant,
   searchQuery = '',
+  sectionRequest,
+  wishlistOnly,
+  onClearWishlist,
+  onOpenGreenhouse,
+  onOpenCart,
+  onNavigate,
+  onOpenArticle,
 }) => {
   const { isDesktop, numColumns } = useResponsive();
   const { currentZone, currentCity, openZonePicker } = useZoneStore();
-  const addItem = useCartStore((s) => s.addItem);
+  const wishlistIds = useWishlistStore((s) => s.wishlistIds);
+  const plants = usePlantsStore((s) => s.plants);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Filter plants based on category and search query
+  // Finder: live draft + applied set (applied on "Find My Plants")
+  const [finderDraft, setFinderDraft] = useState<FinderPreferences>({ ...EMPTY_FINDER });
+  const [appliedFinder, setAppliedFinder] = useState<FinderPreferences>({ ...EMPTY_FINDER });
+
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionY = useRef<Record<string, number>>({});
+
+  const scrollToSection = (section: HomeSection) => {
+    const y = sectionY.current[section];
+    if (y !== undefined) {
+      scrollRef.current?.scrollTo({ y: Math.max(0, y - 80), animated: true });
+    } else if (section === 'top') {
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  };
+
+  useEffect(() => {
+    if (sectionRequest) scrollToSection(sectionRequest.section);
+  }, [sectionRequest]);
+
+  const recordY = (section: HomeSection) => ({
+    onLayout: (e: any) => {
+      sectionY.current[section] = e.nativeEvent.layout.y;
+    },
+  });
+
+  // Live match count for the finder UI (based on draft + zone)
+  const draftMatchCount = useMemo(
+    () => plants.filter((p) => matchesFinder(p, finderDraft)).length,
+    [plants, finderDraft]
+  );
+
+  // Personalized recommendations: applied finder prefs, sorted by zone match
+  const recommendations = useMemo(() => {
+    const base = hasPrefs(appliedFinder)
+      ? plants.filter((p) => matchesFinder(p, appliedFinder))
+      : plants.filter((p) => (p.zoneMatchPercent[currentZone] || 80) >= 90);
+    return [...base]
+      .sort(
+        (a, b) =>
+          (b.zoneMatchPercent[currentZone] || 80) - (a.zoneMatchPercent[currentZone] || 80)
+      )
+      .slice(0, 4);
+  }, [plants, appliedFinder, currentZone]);
+
+  // Catalog grid: search + chips + wishlist + applied finder (reuses one pipeline)
   const filteredPlants = useMemo(() => {
-    let list = [...PLANTS_DATA];
+    let list = [...plants];
+
+    if (wishlistOnly) {
+      list = list.filter((p) => wishlistIds.includes(p.id));
+    }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -52,35 +156,55 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       if (selectedCategory === 'pet-friendly') list = list.filter((p) => p.petSafe);
       if (selectedCategory === 'air-purifying') list = list.filter((p) => p.airPurifying);
       if (selectedCategory === 'easy-care') list = list.filter((p) => p.easyCare);
-      if (selectedCategory === 'under-35') list = list.filter((p) => p.price <= 35);
+      if (selectedCategory === 'under-3000') list = list.filter((p) => p.price <= 3000);
       if (selectedCategory === 'trees') list = list.filter((p) => p.tree);
     }
 
-    return list;
-  }, [selectedCategory, searchQuery]);
+    if (hasPrefs(appliedFinder)) {
+      list = list.filter((p) => matchesFinder(p, appliedFinder));
+    }
 
-  // Top zone-recommended specimens
-  const zoneRecommendations = useMemo(() => {
-    return [...PLANTS_DATA]
-      .filter((p) => (p.zoneMatchPercent[currentZone] || 80) >= 90)
-      .slice(0, 4);
-  }, [currentZone]);
+    return list;
+  }, [plants, selectedCategory, searchQuery, wishlistOnly, wishlistIds, appliedFinder]);
+
+  const handleApplyFinder = () => {
+    setAppliedFinder({ ...finderDraft });
+    setSelectedCategory('all');
+    requestAnimationFrame(() => scrollToSection('shop'));
+  };
+
+  const handleNeedSelect = (id: string) => {
+    setSelectedCategory(id);
+    setAppliedFinder({ ...EMPTY_FINDER });
+    scrollToSection('shop');
+  };
+
+  const go = (s: HomeSection) => {
+    if (onNavigate) onNavigate(s);
+    else scrollToSection(s);
+  };
 
   return (
     <ScrollView
+      ref={scrollRef}
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.innerContent, isDesktop && styles.desktopInner]}>
-        {/* Editorial Hero Banner */}
-        <HeroBanner
-          onExplore={() => setSelectedCategory('all')}
-          onSelectFeatured={(id) => {
-            const plant = PLANTS_DATA.find((p) => p.id === id);
-            if (plant) onSelectPlant(plant);
-          }}
-        />
+        <View {...recordY('top')}>
+          <HeroBanner
+            onExplore={() => go('shop')}
+            onFindPlant={() => go('finder')}
+            onSelectFeatured={(id) => {
+              const plant = plants.find((p) => p.id === id);
+              if (plant) onSelectPlant(plant);
+            }}
+            onNavigate={(s) => go(s)}
+            onOpenCart={() => onOpenCart?.()}
+            onOpenGreenhouse={() => onOpenGreenhouse?.()}
+          />
+        </View>
 
         {/* Location & Climate Context Bar */}
         <View style={styles.zoneBarWrapper}>
@@ -88,6 +212,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             style={styles.zoneBar}
             activeOpacity={0.8}
             onPress={openZonePicker}
+            accessibilityRole="button"
+            accessibilityLabel={`Growing location ${currentCity}, zone ${currentZone}. Change.`}
           >
             <View style={styles.zoneBarLeft}>
               <Ionicons name="location" size={16} color={Colors.secondary} />
@@ -104,98 +230,91 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Requirement Filter Chips */}
-        <FilterChips
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
+        {/* Plant Finder */}
+        <View style={styles.section} {...recordY('finder')}>
+          <PlantFinder
+            draft={finderDraft}
+            onDraftChange={setFinderDraft}
+            onApply={handleApplyFinder}
+            matchCount={draftMatchCount}
+          />
+        </View>
 
-        {/* "Thriving in Your Area" Recommended Carousel */}
-        {zoneRecommendations.length > 0 && selectedCategory === 'all' && (
-          <View style={styles.zoneSection}>
-            <View style={styles.sectionHeader}>
-              <View>
-                <View style={styles.sectionTitleRow}>
-                  <Text style={styles.sectionTitle}>Thriving in Your Area</Text>
-                  <View style={styles.zoneBadgePill}>
-                    <Text style={styles.zoneBadgePillText}>Zone {currentZone}</Text>
-                  </View>
-                </View>
-                <Text style={styles.sectionSubtitle}>
-                  Optimized for regional humidity & moderate sun
-                </Text>
-              </View>
-              <TouchableOpacity onPress={openZonePicker}>
-                <Text style={styles.seeAllText}>Zone Info</Text>
+        {/* Personalized recommendations */}
+        <View style={styles.section}>
+          <SectionHeading
+            eyebrow={hasPrefs(appliedFinder) ? 'Matched to you' : `Zone ${currentZone}`}
+            title="Plants That Fit Your Space"
+            subtitle={
+              hasPrefs(appliedFinder)
+                ? 'Filtered by your finder preferences and ranked by zone match.'
+                : 'Top climate matches for your growing zone.'
+            }
+            actionLabel="Refine"
+            onAction={() => go('finder')}
+          />
+          {recommendations.length === 0 ? (
+            <View style={styles.recoEmpty}>
+              <Text style={styles.recoEmptyText}>
+                No plants match that combination yet — try clearing a preference.
+              </Text>
+              <TouchableOpacity
+                style={styles.resetButton}
+                onPress={() => {
+                  setFinderDraft({ ...EMPTY_FINDER });
+                  setAppliedFinder({ ...EMPTY_FINDER });
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Clear finder preferences"
+              >
+                <Text style={styles.resetButtonText}>Clear Preferences</Text>
               </TouchableOpacity>
             </View>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.zoneScroll}
-            >
-              {zoneRecommendations.map((plant) => (
-                <TouchableOpacity
-                  key={plant.id}
-                  style={styles.zoneMiniCard}
-                  activeOpacity={0.9}
-                  onPress={() => onSelectPlant(plant)}
-                >
-                  <View style={styles.zoneImageWrap}>
-                    <Image source={{ uri: plant.imageUrl }} style={styles.zoneImage} />
-                    <View style={styles.zoneMatchTag}>
-                      <Text style={styles.zoneMatchTagText}>
-                        {plant.zoneMatchPercent[currentZone] || 95}% Match
-                      </Text>
-                    </View>
-                    <View style={styles.climateMiniTag}>
-                      <Text style={styles.climateMiniTagText} numberOfLines={1}>
-                        {plant.climateTag}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.zoneInfo}>
-                    <Text style={styles.zonePlantName} numberOfLines={1}>
-                      {plant.name}
-                    </Text>
-                    <Text style={styles.zoneCommonName} numberOfLines={1}>
-                      {plant.botanicalName}
-                    </Text>
-                    <View style={styles.zonePriceRow}>
-                      <Text style={styles.zonePrice}>${plant.price.toFixed(0)}</Text>
-                      <TouchableOpacity
-                        style={styles.zoneAddBtn}
-                        onPress={() => addItem(plant, 'sm', 'sage', true, 1)}
-                      >
-                        <Ionicons name="add" size={14} color={Colors.onPrimary} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+          ) : (
+            <View style={[styles.gridRow, { flexDirection: 'row', flexWrap: 'wrap' }]}>
+              {recommendations.map((plant) => (
+                <View key={plant.id} style={{ width: `${100 / numColumns}%` as any }}>
+                  <PlantCard plant={plant} onPress={onSelectPlant} />
+                </View>
               ))}
-            </ScrollView>
-          </View>
-        )}
+            </View>
+          )}
+        </View>
 
-        {/* Botanical Catalog Grid */}
-        <View style={styles.catalogSection}>
+        {/* Shop by need */}
+        <View style={styles.section}>
+          <ShopByNeed onSelect={handleNeedSelect} />
+        </View>
+
+        {/* Catalog grid */}
+        <View style={styles.section} {...recordY('shop')}>
           <View style={styles.catalogHeader}>
             <Text style={styles.catalogTitle}>
-              {selectedCategory === 'all'
-                ? 'All Botanical Specimens'
-                : `Filtered Plants (${filteredPlants.length})`}
+              {wishlistOnly
+                ? `Your Wishlist (${filteredPlants.length})`
+                : selectedCategory === 'all'
+                  ? 'Shop All Plants'
+                  : `Filtered Plants (${filteredPlants.length})`}
             </Text>
             <Text style={styles.catalogCount}>
-              Showing {filteredPlants.length} curated specimens
+              {wishlistOnly
+                ? 'Everything you have saved.'
+                : `Showing ${filteredPlants.length} curated specimens`}
             </Text>
+            {wishlistOnly && onClearWishlist ? (
+              <TouchableOpacity onPress={onClearWishlist}>
+                <Text style={styles.seeAllText}>Show all plants</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
 
-          {/* Dynamic Grid */}
-          <View style={[styles.gridContainer, { flexDirection: 'row', flexWrap: 'wrap' }]}>
+          <FilterChips
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+
+          <View style={[styles.gridRow, { flexDirection: 'row', flexWrap: 'wrap' }]}>
             {filteredPlants.map((plant) => {
-              // Calculate column percentage based on breakpoint
               const colWidth = `${100 / numColumns}%` as any;
               return (
                 <View key={plant.id} style={{ width: colWidth }}>
@@ -208,18 +327,53 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {filteredPlants.length === 0 && (
             <View style={styles.emptyState}>
               <Ionicons name="leaf-outline" size={48} color={Colors.outline} />
-              <Text style={styles.emptyTitle}>No botanical specimens found</Text>
+              <Text style={styles.emptyTitle}>
+                {wishlistOnly ? 'Your wishlist is empty' : 'No botanical specimens found'}
+              </Text>
               <Text style={styles.emptySubtitle}>
-                Try clearing your search query or adjusting your filters.
+                {wishlistOnly
+                  ? 'Tap the heart on any plant to save it here.'
+                  : 'Try clearing your search query or adjusting your filters.'}
               </Text>
               <TouchableOpacity
                 style={styles.resetButton}
-                onPress={() => setSelectedCategory('all')}
+                onPress={() => {
+                  setSelectedCategory('all');
+                  setAppliedFinder({ ...EMPTY_FINDER });
+                  if (wishlistOnly && onClearWishlist) onClearWishlist();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Show all plants"
               >
                 <Text style={styles.resetButtonText}>Show All Plants</Text>
               </TouchableOpacity>
             </View>
           )}
+        </View>
+
+        {/* Featured */}
+        <View style={styles.section} {...recordY('featured')}>
+          <FeaturedPlants onSelectPlant={onSelectPlant} />
+        </View>
+
+        {/* Journal */}
+        <View style={styles.section} {...recordY('journal')}>
+          <PlantJournal onOpenArticle={(slug) => onOpenArticle?.(slug)} />
+        </View>
+
+        {/* Greenhouse */}
+        <View style={styles.section} {...recordY('greenhouse')}>
+          <GreenhousePreview onOpen={() => onOpenGreenhouse?.()} />
+        </View>
+
+        {/* Newsletter */}
+        <View style={styles.section} {...recordY('newsletter')}>
+          <Newsletter />
+        </View>
+
+        {/* Footer */}
+        <View style={styles.section}>
+          <Footer onNavigate={go} />
         </View>
       </View>
     </ScrollView>
@@ -241,6 +395,10 @@ const styles = StyleSheet.create({
     maxWidth: 1280,
     alignSelf: 'center',
     width: '100%',
+  },
+  section: {
+    paddingHorizontal: Spacing.marginMobile,
+    paddingTop: Spacing.lg,
   },
   zoneBarWrapper: {
     paddingHorizontal: Spacing.marginMobile,
@@ -286,40 +444,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.secondary,
   },
-  zoneSection: {
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.sm,
+  gridRow: {
+    width: '100%',
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.marginMobile,
-    marginBottom: 10,
+  catalogHeader: {
+    paddingHorizontal: 6,
+    marginBottom: 8,
+    gap: 2,
   },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  sectionTitle: {
+  catalogTitle: {
     fontFamily: Platform.OS === 'web' ? 'Playfair Display, serif' : 'System',
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.primary,
-  },
-  zoneBadgePill: {
-    backgroundColor: Colors.secondaryContainer,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: Radii.full,
-  },
-  zoneBadgePillText: {
-    fontSize: 10,
+    fontSize: 22,
+    lineHeight: 28,
     fontWeight: '700',
     color: Colors.primary,
+    letterSpacing: -0.3,
   },
-  sectionSubtitle: {
+  catalogCount: {
     fontSize: 12,
     color: Colors.onSurfaceVariant,
     marginTop: 2,
@@ -329,115 +470,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.secondary,
   },
-  zoneScroll: {
-    paddingHorizontal: Spacing.marginMobile,
-    gap: 12,
-    paddingVertical: 6,
+  recoEmpty: {
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 24,
   },
-  zoneMiniCard: {
-    width: 155,
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: Radii.lg,
-    overflow: 'hidden',
-    ...Shadows.sm,
-    borderWidth: 1,
-    borderColor: Colors.surfaceContainerLow,
-  },
-  zoneImageWrap: {
-    width: '100%',
-    aspectRatio: 1.1,
-    position: 'relative',
-    backgroundColor: Colors.surfaceContainerLow,
-  },
-  zoneImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  zoneMatchTag: {
-    position: 'absolute',
-    top: 6,
-    left: 6,
-    backgroundColor: Colors.secondary,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: Radii.full,
-  },
-  zoneMatchTagText: {
-    color: Colors.onSecondary,
-    fontSize: 9,
-    fontWeight: '700',
-  },
-  climateMiniTag: {
-    position: 'absolute',
-    bottom: 6,
-    left: 6,
-    right: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: Radii.full,
-  },
-  climateMiniTagText: {
-    fontSize: 9,
-    color: Colors.onSurface,
-    fontWeight: '600',
-  },
-  zoneInfo: {
-    padding: 10,
-    gap: 2,
-  },
-  zonePlantName: {
-    fontFamily: Platform.OS === 'web' ? 'Playfair Display, serif' : 'System',
+  recoEmptyText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: Colors.primary,
-  },
-  zoneCommonName: {
-    fontSize: 10,
     color: Colors.onSurfaceVariant,
-    fontStyle: 'italic',
-  },
-  zonePriceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 6,
-  },
-  zonePrice: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  zoneAddBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  catalogSection: {
-    paddingTop: Spacing.md,
-    paddingHorizontal: Spacing.marginMobile - 6,
-  },
-  catalogHeader: {
-    paddingHorizontal: 6,
-    marginBottom: 8,
-  },
-  catalogTitle: {
-    fontFamily: Platform.OS === 'web' ? 'Playfair Display, serif' : 'System',
-    fontSize: 20,
-    fontWeight: '600',
-    color: Colors.primary,
-  },
-  catalogCount: {
-    fontSize: 12,
-    color: Colors.onSurfaceVariant,
-    marginTop: 2,
-  },
-  gridContainer: {
-    width: '100%',
+    textAlign: 'center',
+    maxWidth: 320,
   },
   emptyState: {
     alignItems: 'center',

@@ -11,6 +11,7 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { PlantSpecimen } from '../data/plants';
 import { Colors, Radii, Spacing, Shadows } from '../constants/theme';
+import { formatINR } from '../utils/currency';
 import { useResponsive } from '../hooks/useResponsive';
 import { useWishlistStore } from '../store/useWishlistStore';
 import { useCartStore } from '../store/useCartStore';
@@ -60,6 +61,8 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
           style={styles.backButton}
           onPress={onBack}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Back to catalog"
         >
           <Ionicons name="arrow-back" size={22} color={Colors.primary} />
           {isDesktop && <Text style={styles.backButtonText}>Back to Catalog</Text>}
@@ -73,6 +76,8 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
           <TouchableOpacity
             style={styles.actionIconBtn}
             onPress={() => toggleWishlist(plant.id)}
+            accessibilityRole="button"
+            accessibilityLabel={favorited ? `Remove ${plant.name} from wishlist` : `Save ${plant.name} to wishlist`}
           >
             <Ionicons
               name={favorited ? 'heart' : 'heart-outline'}
@@ -163,16 +168,16 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
             {/* Pricing Bar */}
             <View style={styles.priceRow}>
               <View style={styles.priceGroup}>
-                <Text style={styles.currentPrice}>${currentPrice.toFixed(2)}</Text>
+                <Text style={styles.currentPrice}>{formatINR(currentPrice)}</Text>
                 {plant.originalPrice && (
                   <Text style={styles.originalPrice}>
-                    ${(plant.originalPrice + (selectedSize?.priceDelta || 0)).toFixed(2)}
+                    {formatINR(plant.originalPrice + (selectedSize?.priceDelta || 0))}
                   </Text>
                 )}
                 {plant.originalPrice && (
                   <View style={styles.saveBadge}>
                     <Text style={styles.saveBadgeText}>
-                      Save ${(plant.originalPrice - plant.price).toFixed(0)}
+                      Save {formatINR(plant.originalPrice - plant.price)}
                     </Text>
                   </View>
                 )}
@@ -214,6 +219,9 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
                       style={[styles.optionPill, isSelected && styles.optionPillActive]}
                       onPress={() => setSelectedSizeId(s.id)}
                       activeOpacity={0.8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Size ${s.name}, ${s.potDiameter}`}
+                      accessibilityState={{ selected: isSelected }}
                     >
                       <Text style={[styles.optionPillText, isSelected && styles.optionPillTextActive]}>
                         {s.name}
@@ -241,6 +249,9 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
                       style={[styles.swatchBtn, isSelected && styles.swatchBtnActive]}
                       onPress={() => setSelectedVesselId(v.id)}
                       activeOpacity={0.8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Vessel ${v.name}`}
+                      accessibilityState={{ selected: isSelected }}
                     >
                       <View style={[styles.colorCircle, { backgroundColor: v.colorHex }]} />
                       <Text style={[styles.swatchText, isSelected && styles.swatchTextActive]}>
@@ -257,6 +268,9 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
               style={styles.drainageRow}
               activeOpacity={0.8}
               onPress={() => setDrainage(!drainage)}
+              accessibilityRole="checkbox"
+              accessibilityLabel="Drainage hole and matching saucer"
+              accessibilityState={{ checked: drainage }}
             >
               <View style={styles.drainageTextWrap}>
                 <Ionicons name="water-outline" size={18} color={Colors.primary} />
@@ -312,7 +326,7 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
         <View style={styles.toast}>
           <Ionicons name="checkmark-circle" size={20} color={Colors.secondaryContainer} />
           <Text style={styles.toastText}>Added {plant.name} to Botanical Bag!</Text>
-          <TouchableOpacity onPress={onGoToCart}>
+          <TouchableOpacity onPress={onGoToCart} accessibilityRole="button" accessibilityLabel="View bag">
             <Text style={styles.toastAction}>View Bag</Text>
           </TouchableOpacity>
         </View>
@@ -326,6 +340,8 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
             <TouchableOpacity
               style={styles.qtyBtn}
               onPress={() => setQuantity(Math.max(1, quantity - 1))}
+              accessibilityRole="button"
+              accessibilityLabel="Decrease quantity"
             >
               <Ionicons name="remove" size={16} color={Colors.onSurface} />
             </TouchableOpacity>
@@ -333,6 +349,8 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
             <TouchableOpacity
               style={styles.qtyBtn}
               onPress={() => setQuantity(quantity + 1)}
+              accessibilityRole="button"
+              accessibilityLabel="Increase quantity"
             >
               <Ionicons name="add" size={16} color={Colors.onSurface} />
             </TouchableOpacity>
@@ -343,9 +361,11 @@ export const ProductDetailsScreen: React.FC<ProductDetailsScreenProps> = ({
             style={styles.addToCartBtn}
             activeOpacity={0.85}
             onPress={handleAddToCart}
+            accessibilityRole="button"
+            accessibilityLabel={`Add ${plant.name} to bag`}
           >
             <Text style={styles.addToCartBtnText}>
-              Add to Bag • ${(currentPrice * quantity).toFixed(2)}
+              Add to Bag • {formatINR(currentPrice * quantity)}
             </Text>
             <Ionicons name="bag-add-outline" size={20} color={Colors.onPrimary} />
           </TouchableOpacity>

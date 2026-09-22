@@ -22,7 +22,7 @@ const CHIPS: FilterChipOption[] = [
   { id: 'pet-friendly', label: 'Pet Friendly', iconName: 'paw-outline', iconType: 'ionicons' },
   { id: 'air-purifying', label: 'Air Purifying', iconName: 'weather-windy', iconType: 'material' },
   { id: 'easy-care', label: 'Easy Care', iconName: 'water-outline', iconType: 'ionicons' },
-  { id: 'under-35', label: 'Under $35', iconName: 'pricetag-outline', iconType: 'ionicons' },
+  { id: 'under-3000', label: 'Under ₹3,000', iconName: 'pricetag-outline', iconType: 'ionicons' },
   { id: 'trees', label: 'Large Trees', iconName: 'tree', iconType: 'material' },
 ];
 
@@ -50,6 +50,9 @@ export const FilterChips: React.FC<FilterChipsProps> = ({
               style={[styles.chip, isSelected && styles.chipActive]}
               onPress={() => onSelectCategory(chip.id)}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={`Filter by ${chip.label}`}
+              accessibilityState={{ selected: isSelected }}
             >
               {chip.iconType === 'ionicons' ? (
                 <Ionicons
