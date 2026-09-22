@@ -8,6 +8,9 @@ import { ProductDetailsScreen } from '@/screens/ProductDetailsScreen';
 import { CartScreen } from '@/screens/CartScreen';
 import { AccountScreen } from '@/screens/AccountScreen';
 import { LocationZoneModal } from '@/screens/LocationZoneModal';
+import { ChatScreen } from '@/screens/ChatScreen';
+import { ChatFab } from '@/components/ChatFab';
+import { PlantSpecimen, PLANTS_DATA } from '@/data/plants';
 import { PlantSpecimen } from '@/data/plants';
 import { Colors } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -135,6 +138,10 @@ export default function BotanicalApp() {
 
         {/* Global Growing Zone Modal */}
         <LocationZoneModal />
+
+        {/* Planty Chatbot */}
+        <ChatFab />
+        <ChatScreen />
       </View>
     </SafeAreaView>
   );
