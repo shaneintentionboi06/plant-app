@@ -5,6 +5,7 @@
 import { PLANTS_DATA, USDA_ZONES, PlantSpecimen } from '../data/plants';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || '';
+const CHATBOT_BASE_URL = process.env.EXPO_PUBLIC_CHATBOT_URL || '';
 
 export interface PlantFilterParams {
   category?: string;
@@ -88,5 +89,34 @@ export const ApiService = {
       (z) => z.zip.includes(q) || z.city.toLowerCase().includes(q) || z.zone.toLowerCase() === q
     );
     return match || USDA_ZONES[0];
+  },
+
+  // 4. Planty Chatbot
+  sendChatMessage: async (message: string): Promise<string> => {
+    if (!CHATBOT_BASE_URL) {
+      throw new Error('Chatbot is not configured (EXPO_PUBLIC_CHATBOT_URL missing).');
+    }
+    const res = await fetch(`${CHATBOT_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+    if (!res.ok) {
+      throw new Error(`Chatbot request failed with status ${res.status}`);
+    }
+    const data = await res.json();
+    return data.reply || "Sorry, I could not generate a response.";
+  },
+
+  getChatbotHealth: async (): Promise<boolean> => {
+    if (!CHATBOT_BASE_URL) return false;
+    try {
+      const res = await fetch(`${CHATBOT_BASE_URL}/health`);
+      if (!res.ok) return false;
+      const data = await res.json();
+      return data.ollama === true;
+    } catch {
+      return false;
+    }
   },
 };
